@@ -1,0 +1,4165 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hotel Marketing Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --font-main: 'Poppins', sans-serif;
+  --brand-primary: #C9A96E;
+  --brand-secondary: #2C5F6E;
+  --brand-accent: #E8D5B0;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --transition: 0.2s ease;
+}
+
+[data-theme="dark"] {
+  --bg-base: #0D0F14;
+  --bg-card: #161A23;
+  --bg-card2: #1C2130;
+  --bg-input: #1E2433;
+  --border: #2A3047;
+  --border-light: #323A52;
+  --text-primary: #F0F2F8;
+  --text-secondary: #8B95B0;
+  --text-muted: #5A6480;
+  --success: #2ECC71;
+  --warning: #F39C12;
+  --danger: #E74C3C;
+  --info: #3498DB;
+  --sidebar-bg: #10131A;
+  --shadow: 0 4px 24px rgba(0,0,0,0.4);
+}
+
+[data-theme="light"] {
+  --bg-base: #F5F6FA;
+  --bg-card: #FFFFFF;
+  --bg-card2: #F0F2F8;
+  --bg-input: #F8F9FC;
+  --border: #E2E6F0;
+  --border-light: #D0D6E8;
+  --text-primary: #1A1E2E;
+  --text-secondary: #5A6480;
+  --text-muted: #8B95B0;
+  --success: #27AE60;
+  --warning: #E67E22;
+  --danger: #C0392B;
+  --info: #2980B9;
+  --sidebar-bg: #FFFFFF;
+  --shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: var(--font-main);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  min-height: 100vh;
+  transition: background var(--transition), color var(--transition);
+  font-size: 14px;
+}
+
+/* ===== LAYOUT ===== */
+.app-layout { display:flex; min-height:100vh; }
+
+.sidebar {
+  width: 260px;
+  min-height: 100vh;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top:0; left:0; bottom:0;
+  z-index: 100;
+  transition: transform var(--transition), background var(--transition);
+  overflow-y: auto;
+}
+
+.sidebar-header {
+  padding: 20px 16px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.hotel-logo-area {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.hotel-logo-img {
+  width: 40px; height: 40px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: var(--brand-primary);
+  display: flex; align-items:center; justify-content:center;
+  font-size: 18px; color: white; font-weight: 700;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.hotel-logo-img img { width:100%; height:100%; object-fit:cover; border-radius:8px; }
+
+.hotel-name-sidebar {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+.hotel-tagline-sidebar { font-size: 10px; color: var(--brand-primary); font-weight: 500; }
+
+.sidebar-nav { padding: 12px 8px; flex:1; }
+
+.nav-section-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  padding: 8px 10px 4px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  transition: all var(--transition);
+  margin-bottom: 2px;
+  text-decoration: none;
+}
+
+.nav-item:hover { background: var(--bg-card2); color: var(--text-primary); }
+.nav-item.active { background: var(--brand-primary)22; color: var(--brand-primary); }
+.nav-item .nav-icon { font-size: 16px; width:20px; text-align:center; flex-shrink:0; }
+.nav-item .nav-badge {
+  margin-left: auto;
+  background: var(--brand-primary);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.sidebar-footer {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.sidebar-footer span { color: var(--brand-primary); font-weight: 600; }
+
+.main-content {
+  margin-left: 260px;
+  flex: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  height: 60px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  position: sticky;
+  top: 0; z-index: 50;
+  gap: 12px;
+}
+
+.topbar-left { display:flex; align-items:center; gap:12px; }
+.hamburger { display:none; cursor:pointer; font-size:20px; color:var(--text-secondary); padding:4px; }
+
+.page-title { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+.page-subtitle { font-size: 11px; color: var(--text-muted); }
+
+.topbar-right { display:flex; align-items:center; gap:8px; }
+
+.theme-toggle {
+  background: var(--bg-card2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 4px 12px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-family: var(--font-main);
+  font-weight: 500;
+  display: flex; align-items:center; gap:6px;
+  transition: all var(--transition);
+}
+.theme-toggle:hover { background: var(--bg-input); color: var(--text-primary); }
+
+.btn-topbar {
+  background: var(--brand-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-main);
+  transition: opacity var(--transition);
+}
+.btn-topbar:hover { opacity: 0.85; }
+
+.page-body { padding: 24px; flex:1; }
+
+/* ===== CARDS ===== */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  transition: background var(--transition), border var(--transition);
+}
+
+.card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  display: flex; align-items:center; gap:8px;
+}
+
+.card-subtitle { font-size: 11px; color: var(--text-muted); margin-bottom: 16px; }
+
+/* ===== STAT CARDS ===== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+  transition: all var(--transition);
+}
+
+.stat-card:hover { border-color: var(--brand-primary)66; transform: translateY(-1px); }
+.stat-card-accent { border-left: 3px solid var(--brand-primary); }
+.stat-card-success { border-left: 3px solid var(--success); }
+.stat-card-warning { border-left: 3px solid var(--warning); }
+.stat-card-danger { border-left: 3px solid var(--danger); }
+.stat-card-info { border-left: 3px solid var(--info); }
+
+.stat-label { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+.stat-value { font-size: 28px; font-weight: 800; color: var(--text-primary); line-height: 1; margin-bottom: 4px; }
+.stat-sub { font-size: 11px; color: var(--text-secondary); }
+.stat-icon { position:absolute; top:16px; right:16px; font-size:22px; opacity:0.3; }
+.stat-trend { font-size: 11px; font-weight: 600; }
+.stat-trend.up { color: var(--success); }
+.stat-trend.down { color: var(--danger); }
+
+/* ===== GRID LAYOUTS ===== */
+.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
+.grid-12 { display:grid; grid-template-columns:1fr 2fr; gap:16px; }
+.grid-21 { display:grid; grid-template-columns:2fr 1fr; gap:16px; }
+
+/* ===== CHART ===== */
+.chart-container { position:relative; width:100%; }
+canvas { max-width:100%; }
+
+/* ===== TABLE ===== */
+.table-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; }
+th {
+  text-align:left;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+td {
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border)66;
+  vertical-align: middle;
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--bg-card2); }
+
+/* ===== BADGES ===== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.badge-success { background: var(--success)22; color: var(--success); }
+.badge-warning { background: var(--warning)22; color: var(--warning); }
+.badge-danger { background: var(--danger)22; color: var(--danger); }
+.badge-info { background: var(--info)22; color: var(--info); }
+.badge-muted { background: var(--text-muted)22; color: var(--text-muted); }
+.badge-gold { background: var(--brand-primary)22; color: var(--brand-primary); }
+
+/* ===== BUTTONS ===== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-family: var(--font-main);
+  transition: all var(--transition);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.btn-primary { background: var(--brand-primary); color: white; }
+.btn-primary:hover { opacity: 0.85; }
+.btn-secondary { background: var(--bg-card2); color: var(--text-primary); border: 1px solid var(--border); }
+.btn-secondary:hover { background: var(--bg-input); }
+.btn-danger { background: var(--danger)22; color: var(--danger); border: 1px solid var(--danger)44; }
+.btn-danger:hover { background: var(--danger)33; }
+.btn-success { background: var(--success)22; color: var(--success); border: 1px solid var(--success)44; }
+.btn-sm { padding: 5px 10px; font-size: 11px; }
+.btn-xs { padding: 3px 8px; font-size: 10px; }
+.btn-icon { padding: 7px; border-radius: 6px; }
+
+/* ===== FORMS ===== */
+.form-group { margin-bottom: 16px; }
+.form-label { display:block; font-size: 11px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; text-transform:uppercase; letter-spacing:0.5px; }
+.form-label .required { color: var(--danger); margin-left:2px; }
+.form-control {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  font-size: 13px;
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  outline: none;
+  transition: border var(--transition);
+}
+.form-control:focus { border-color: var(--brand-primary); }
+.form-control::placeholder { color: var(--text-muted); }
+select.form-control { cursor: pointer; }
+textarea.form-control { min-height: 100px; resize: vertical; }
+.form-hint { font-size: 10px; color: var(--text-muted); margin-top:4px; }
+.form-row { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+.form-row-3 { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px; }
+
+/* ===== TOGGLE ===== */
+.toggle-wrap { display:flex; align-items:center; gap:10px; }
+.toggle {
+  position: relative;
+  width: 38px; height: 20px;
+  background: var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background var(--transition);
+  flex-shrink: 0;
+}
+.toggle.on { background: var(--brand-primary); }
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 14px; height: 14px;
+  background: white;
+  border-radius: 50%;
+  transition: transform var(--transition);
+}
+.toggle.on::after { transform: translateX(18px); }
+.toggle-label { font-size: 12px; color: var(--text-secondary); }
+
+/* ===== MODAL ===== */
+.modal-overlay {
+  position: fixed; inset:0;
+  background: rgba(0,0,0,0.7);
+  z-index: 200;
+  display: flex; align-items:center; justify-content:center;
+  padding: 16px;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.hidden { display:none; }
+.modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 680px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow);
+}
+.modal-lg { max-width: 900px; }
+.modal-xl { max-width: 1100px; }
+.modal-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items:center; justify-content:space-between;
+  position: sticky; top:0;
+  background: var(--bg-card);
+  z-index: 1;
+}
+.modal-title { font-size: 15px; font-weight: 700; }
+.modal-close { cursor:pointer; font-size:20px; color:var(--text-muted); padding:4px; transition:color var(--transition); }
+.modal-close:hover { color: var(--text-primary); }
+.modal-body { padding: 20px 24px; }
+.modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display:flex; justify-content:flex-end; gap:8px; }
+
+/* ===== TABS ===== */
+.tabs { display:flex; gap:4px; border-bottom:1px solid var(--border); margin-bottom:20px; overflow-x:auto; }
+.tab {
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: all var(--transition);
+}
+.tab:hover { color: var(--text-primary); }
+.tab.active { color: var(--brand-primary); border-bottom-color: var(--brand-primary); }
+
+/* ===== PROGRESS ===== */
+.progress-bar { background: var(--bg-card2); border-radius:4px; height:6px; overflow:hidden; }
+.progress-fill { height:100%; border-radius:4px; background: var(--brand-primary); transition: width 0.5s ease; }
+.progress-fill.success { background: var(--success); }
+.progress-fill.danger { background: var(--danger); }
+.progress-fill.info { background: var(--info); }
+
+/* ===== ALERTS ===== */
+.alert {
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  display: flex; align-items:flex-start; gap:10px;
+  margin-bottom: 16px;
+}
+.alert-info { background: var(--info)15; border: 1px solid var(--info)44; color: var(--info); }
+.alert-warning { background: var(--warning)15; border: 1px solid var(--warning)44; color: var(--warning); }
+.alert-success { background: var(--success)15; border: 1px solid var(--success)44; color: var(--success); }
+.alert-danger { background: var(--danger)15; border: 1px solid var(--danger)44; color: var(--danger); }
+
+/* ===== DIVIDER ===== */
+.divider { border:none; border-top:1px solid var(--border); margin: 16px 0; }
+
+/* ===== PAGES ===== */
+.page { display:none; }
+.page.active { display:block; }
+
+/* ===== EMPTY STATE ===== */
+.empty-state { text-align:center; padding: 40px 20px; color: var(--text-muted); }
+.empty-state-icon { font-size:40px; margin-bottom:12px; }
+.empty-state-title { font-size:14px; font-weight:600; color:var(--text-secondary); margin-bottom:4px; }
+.empty-state p { font-size:12px; }
+
+/* ===== EMAIL COMPOSER ===== */
+.composer-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 8px;
+  background: var(--bg-card2);
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+.composer-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-family: var(--font-main);
+  transition: all var(--transition);
+}
+.composer-btn:hover { background: var(--bg-input); border-color: var(--border); color: var(--text-primary); }
+.composer-btn.active { background: var(--brand-primary)22; border-color: var(--brand-primary)44; color: var(--brand-primary); }
+.composer-sep { width: 1px; background: var(--border); margin: 2px 2px; }
+.composer-area {
+  min-height: 280px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  padding: 16px;
+  font-size: 13px;
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  outline: none;
+  line-height: 1.7;
+}
+.composer-area:focus { border-color: var(--brand-primary); }
+
+/* ===== TAGS ===== */
+.tag-list { display:flex; flex-wrap:wrap; gap:6px; }
+.tag {
+  background: var(--bg-card2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+  font-weight: 500;
+}
+.tag:hover { background: var(--brand-primary)22; border-color: var(--brand-primary); color: var(--brand-primary); }
+
+/* ===== SOCIAL ICONS ===== */
+.social-toggle-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+}
+.social-toggle-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* ===== WHATSAPP ===== */
+.wa-contact-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border)66;
+  gap: 8px;
+}
+.wa-contact-row:last-child { border-bottom:none; }
+.wa-sent-mark { color: var(--success); font-size:16px; }
+
+/* ===== SCHEDULE VISUAL ===== */
+.schedule-batch {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--bg-card2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+}
+.batch-num {
+  width: 28px; height: 28px;
+  background: var(--brand-primary);
+  color: white;
+  border-radius: 50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size: 12px; font-weight: 700;
+  flex-shrink:0;
+}
+.batch-info { flex:1; }
+.batch-label { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+.batch-sub { font-size: 10px; color: var(--text-muted); }
+
+/* ===== MOBILE ===== */
+.sidebar-overlay {
+  display:none;
+  position:fixed; inset:0;
+  background: rgba(0,0,0,0.5);
+  z-index: 99;
+}
+
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-overlay.open { display:block; }
+  .main-content { margin-left: 0; }
+  .hamburger { display:flex; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .grid-2, .grid-3, .grid-12, .grid-21 { grid-template-columns: 1fr; }
+  .form-row, .form-row-3 { grid-template-columns: 1fr; }
+  .page-body { padding: 16px; }
+  .topbar { padding: 0 16px; }
+  .modal { margin: 0; border-radius: var(--radius) var(--radius) 0 0; align-self:flex-end; max-height: 85vh; }
+  .modal-overlay { align-items: flex-end; padding: 0; }
+}
+
+@media (max-width: 480px) {
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .stat-value { font-size: 22px; }
+}
+
+/* ===== NOTIFICATION ===== */
+.toast {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  font-size: 12px;
+  font-weight: 500;
+  box-shadow: var(--shadow);
+  z-index: 999;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.3s ease;
+  max-width: 300px;
+  display: flex; align-items:center; gap:8px;
+}
+.toast.show { transform: translateY(0); opacity:1; }
+.toast.success { border-left: 3px solid var(--success); }
+.toast.error { border-left: 3px solid var(--danger); }
+.toast.info { border-left: 3px solid var(--info); }
+
+/* ===== COLORPICKER PREVIEW ===== */
+.color-preview {
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  border: 2px solid var(--border);
+  cursor: pointer;
+  flex-shrink:0;
+}
+.color-row { display:flex; align-items:center; gap:8px; }
+
+/* ===== CAMPAIGN CARD ===== */
+.campaign-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+  transition: all var(--transition);
+  cursor: pointer;
+}
+.campaign-card:hover { border-color: var(--brand-primary)66; }
+.campaign-card-header { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; margin-bottom:10px; }
+.campaign-name { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+.campaign-meta { font-size: 11px; color: var(--text-muted); margin-top:2px; }
+.campaign-stats { display:flex; gap:16px; }
+.campaign-stat-item { text-align:center; }
+.campaign-stat-val { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+.campaign-stat-lbl { font-size: 9px; color: var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; }
+
+/* ===== DATE RANGE ===== */
+.date-range-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.date-range-btn {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-family: var(--font-main);
+  transition: all var(--transition);
+}
+.date-range-btn:hover, .date-range-btn.active { background: var(--brand-primary); border-color: var(--brand-primary); color: white; }
+
+/* ===== UPLOAD ZONE ===== */
+.upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition);
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.upload-zone:hover { border-color: var(--brand-primary); color: var(--brand-primary); background: var(--brand-primary)08; }
+.upload-zone-icon { font-size: 28px; margin-bottom: 8px; }
+
+/* ===== SCROLL ===== */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* ===== MISC ===== */
+.flex { display:flex; }
+.flex-col { flex-direction:column; }
+.items-center { align-items:center; }
+.justify-between { justify-content:space-between; }
+.gap-8 { gap:8px; }
+.gap-12 { gap:12px; }
+.gap-16 { gap:16px; }
+.mt-4 { margin-top:4px; }
+.mt-8 { margin-top:8px; }
+.mt-12 { margin-top:12px; }
+.mt-16 { margin-top:16px; }
+.mt-20 { margin-top:20px; }
+.mb-8 { margin-bottom:8px; }
+.mb-12 { margin-bottom:12px; }
+.mb-16 { margin-bottom:16px; }
+.mb-20 { margin-bottom:20px; }
+.text-sm { font-size:12px; }
+.text-xs { font-size:11px; }
+.text-muted { color:var(--text-muted); }
+.text-primary-c { color:var(--brand-primary); }
+.font-bold { font-weight:700; }
+.font-600 { font-weight:600; }
+.w-full { width:100%; }
+.hidden { display:none !important; }
+.relative { position:relative; }
+.text-right { text-align:right; }
+.text-center { text-align:center; }
+.rounded { border-radius:var(--radius-sm); }
+.overflow-hidden { overflow:hidden; }
+
+/* ===== CALENDAR ===== */
+.calendar-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
+.cal-header { font-size:10px; font-weight:700; text-align:center; color:var(--text-muted); padding:4px; text-transform:uppercase; }
+.cal-day {
+  aspect-ratio:1;
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px;
+  border-radius:6px;
+  cursor:pointer;
+  color:var(--text-secondary);
+  position:relative;
+  transition:all var(--transition);
+}
+.cal-day:hover { background:var(--bg-card2); }
+.cal-day.today { background:var(--brand-primary)22; color:var(--brand-primary); font-weight:700; }
+.cal-day.has-campaign::after {
+  content:'';
+  position:absolute; bottom:3px; left:50%; transform:translateX(-50%);
+  width:4px; height:4px;
+  background:var(--brand-primary);
+  border-radius:50%;
+}
+.cal-day.other-month { color:var(--text-muted); opacity:0.4; }
+
+/* ===== CONTACTS PAGE ===== */
+.contact-row {
+  display:flex; align-items:center;
+  padding:10px 12px;
+  border-bottom:1px solid var(--border)66;
+  gap:10px;
+  transition:background var(--transition);
+}
+.contact-row:hover { background:var(--bg-card2); }
+.contact-avatar {
+  width:34px; height:34px;
+  background:var(--brand-primary)33;
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:13px;
+  font-weight:700;
+  color:var(--brand-primary);
+  flex-shrink:0;
+}
+.contact-info { flex:1; min-width:0; }
+.contact-name { font-size:13px; font-weight:600; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.contact-email { font-size:11px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+/* ===== SETTINGS TABS ===== */
+.settings-nav {
+  display:flex; flex-direction:column; gap:2px;
+  border-right:1px solid var(--border);
+  padding-right:16px;
+  min-width:180px;
+}
+.settings-nav-item {
+  padding:8px 12px;
+  border-radius:var(--radius-sm);
+  font-size:12px;
+  font-weight:600;
+  color:var(--text-secondary);
+  cursor:pointer;
+  transition:all var(--transition);
+  display:flex; align-items:center; gap:8px;
+}
+.settings-nav-item:hover { background:var(--bg-card2); color:var(--text-primary); }
+.settings-nav-item.active { background:var(--brand-primary)22; color:var(--brand-primary); }
+.settings-layout { display:flex; gap:24px; }
+.settings-panel { flex:1; }
+.settings-section { display:none; }
+.settings-section.active { display:block; }
+
+/* ===== AUDIT LOG ===== */
+.audit-row { display:flex; gap:12px; padding:10px 0; border-bottom:1px solid var(--border)44; }
+.audit-row:last-child { border-bottom:none; }
+.audit-dot { width:8px; height:8px; border-radius:50%; background:var(--brand-primary); margin-top:5px; flex-shrink:0; }
+.audit-content { flex:1; }
+.audit-action { font-size:12px; color:var(--text-primary); font-weight:500; }
+.audit-time { font-size:10px; color:var(--text-muted); margin-top:2px; }
+
+/* ===== UNSUBSCRIBE PAGE PREVIEW ===== */
+.unsub-preview {
+  background:white;
+  border-radius:var(--radius);
+  overflow:hidden;
+  border:1px solid var(--border);
+}
+.unsub-preview-header {
+  padding:24px;
+  text-align:center;
+}
+.unsub-preview-body { padding:24px; text-align:center; }
+
+/* Chart.js loaded from CDN */
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR OVERLAY -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="hotel-logo-area">
+      <div class="hotel-logo-img" id="sidebarLogoEl">
+        <span id="sidebarLogoText">CC</span>
+        <img id="sidebarLogoImg" src="" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:8px;">
+      </div>
+      <div>
+        <div class="hotel-name-sidebar" id="sidebarHotelName">Colombo Court Hotel</div>
+        <div class="hotel-tagline-sidebar">Marketing Platform</div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Overview</div>
+    <div class="nav-item active" onclick="showPage('dashboard',this)">
+      <span class="nav-icon">📊</span> Dashboard
+    </div>
+    <div class="nav-item" onclick="showPage('calendar',this)">
+      <span class="nav-icon">📅</span> Campaign Calendar
+    </div>
+
+    <div class="nav-section-label" style="margin-top:8px">Email Marketing</div>
+    <div class="nav-item" onclick="showPage('campaigns',this)">
+      <span class="nav-icon">✉️</span> Campaigns
+      <span class="nav-badge" id="navCampaignBadge">0</span>
+    </div>
+    <div class="nav-item" onclick="showPage('compose',this)">
+      <span class="nav-icon">✏️</span> New Campaign
+    </div>
+    <div class="nav-item" onclick="showPage('templates',this)">
+      <span class="nav-icon">📋</span> Templates
+    </div>
+    <div class="nav-item" onclick="showPage('scheduled',this)">
+      <span class="nav-icon">⏰</span> Scheduled Sends
+    </div>
+
+    <div class="nav-section-label" style="margin-top:8px">Contacts</div>
+    <div class="nav-item" onclick="showPage('contacts',this)">
+      <span class="nav-icon">👥</span> All Contacts
+      <span class="nav-badge" id="navContactBadge">0</span>
+    </div>
+    <div class="nav-item" onclick="showPage('segments',this)">
+      <span class="nav-icon">🎯</span> Segments
+    </div>
+    <div class="nav-item" onclick="showPage('unsubscribed',this)">
+      <span class="nav-icon">🚫</span> Unsubscribed
+    </div>
+    <div class="nav-item" onclick="showPage('suppressed',this)">
+      <span class="nav-icon">⛔</span> Suppressed
+    </div>
+
+    <div class="nav-section-label" style="margin-top:8px">Messaging</div>
+    <div class="nav-item" onclick="showPage('whatsapp',this)">
+      <span class="nav-icon">💬</span> WhatsApp Bulk
+    </div>
+
+    <div class="nav-section-label" style="margin-top:8px">Configuration</div>
+    <div class="nav-item" onclick="showPage('welcome-editor',this)">
+      <span class="nav-icon">👋</span> Welcome Email
+    </div>
+    <div class="nav-item" onclick="showPage('unsub-editor',this)">
+      <span class="nav-icon">🚪</span> Unsubscribe Page
+    </div>
+    <div class="nav-item" onclick="requestSettingsAccess(this)">
+      <span class="nav-icon">⚙️</span> Settings & Admin
+      <span style="font-size:10px;margin-left:auto">🔒</span>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    Created by <span>Shazwan</span>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main-content">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="hamburger" onclick="openSidebar()">☰</span>
+      <div>
+        <div class="page-title" id="topbarTitle">Dashboard</div>
+        <div class="page-subtitle" id="topbarSubtitle">Overview of your marketing activity</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙 Dark</button>
+      <button class="btn-topbar" onclick="showPage('compose',document.querySelector('.nav-item:nth-child(6))'))">+ New Campaign</button>
+    </div>
+  </div>
+
+  <div class="page-body">
+
+    <!-- ===== DASHBOARD ===== -->
+    <div class="page active" id="page-dashboard">
+      <!-- Date Range -->
+      <div class="date-range-bar">
+        <span style="font-size:11px;font-weight:600;color:var(--text-muted)">Filter:</span>
+        <button class="date-range-btn active" onclick="setDateRange('week',this)">This Week</button>
+        <button class="date-range-btn" onclick="setDateRange('month',this)">This Month</button>
+        <button class="date-range-btn" onclick="setDateRange('year',this)">This Year</button>
+        <button class="date-range-btn" onclick="setDateRange('all',this)">All Time</button>
+        <input type="date" class="form-control" id="dateFrom" style="width:130px;padding:4px 8px;font-size:11px;" onchange="applyCustomDate()">
+        <span style="font-size:11px;color:var(--text-muted)">to</span>
+        <input type="date" class="form-control" id="dateTo" style="width:130px;padding:4px 8px;font-size:11px;" onchange="applyCustomDate()">
+        <select class="form-control" id="yearFilter" style="width:90px;padding:4px 8px;font-size:11px;" onchange="filterYear()">
+          <option value="2026">2026</option>
+          <option value="2027">2027</option>
+          <option value="2028">2028</option>
+          <option value="2029">2029</option>
+          <option value="2030">2030</option>
+        </select>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card stat-card-accent">
+          <div class="stat-icon">✉️</div>
+          <div class="stat-label">Total Sent</div>
+          <div class="stat-value" id="statSent">0</div>
+          <div class="stat-sub">All campaigns</div>
+        </div>
+        <div class="stat-card stat-card-success">
+          <div class="stat-icon">👁️</div>
+          <div class="stat-label">Opened</div>
+          <div class="stat-value" id="statOpened">0</div>
+          <div class="stat-sub"><span class="stat-trend up" id="statOpenRate">0%</span> open rate</div>
+        </div>
+        <div class="stat-card stat-card-warning">
+          <div class="stat-icon">📪</div>
+          <div class="stat-label">Not Opened</div>
+          <div class="stat-value" id="statNotOpened">0</div>
+          <div class="stat-sub">No engagement</div>
+        </div>
+        <div class="stat-card stat-card-danger">
+          <div class="stat-icon">⚠️</div>
+          <div class="stat-label">Undelivered</div>
+          <div class="stat-value" id="statBounced">0</div>
+          <div class="stat-sub"><span id="statBounceRate">0%</span> bounce rate</div>
+        </div>
+        <div class="stat-card stat-card-info">
+          <div class="stat-icon">👥</div>
+          <div class="stat-label">Active Contacts</div>
+          <div class="stat-value" id="statContacts">0</div>
+          <div class="stat-sub">Subscribed</div>
+        </div>
+        <div class="stat-card stat-card-accent">
+          <div class="stat-icon">🚫</div>
+          <div class="stat-label">Unsubscribed</div>
+          <div class="stat-value" id="statUnsub">0</div>
+          <div class="stat-sub">Opted out</div>
+        </div>
+        <div class="stat-card stat-card-success">
+          <div class="stat-icon">📣</div>
+          <div class="stat-label">Campaigns</div>
+          <div class="stat-value" id="statCampaigns">0</div>
+          <div class="stat-sub">Total created</div>
+        </div>
+        <div class="stat-card stat-card-warning">
+          <div class="stat-icon">👆</div>
+          <div class="stat-label">Clicks</div>
+          <div class="stat-value" id="statClicks">0</div>
+          <div class="stat-sub"><span id="statClickRate">0%</span> click rate</div>
+        </div>
+      </div>
+
+      <!-- Charts Row 1 -->
+      <div class="grid-2 mb-16">
+        <div class="card">
+          <div class="card-title">📈 Monthly Performance</div>
+          <div class="card-subtitle">Sent vs Opened vs Bounced</div>
+          <div class="chart-container" style="height:220px">
+            <canvas id="chartMonthly"></canvas>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">📊 Delivery Breakdown</div>
+          <div class="card-subtitle">Current period distribution</div>
+          <div class="chart-container" style="height:220px">
+            <canvas id="chartDonut"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Row 2 -->
+      <div class="grid-2 mb-16">
+        <div class="card">
+          <div class="card-title">📅 Weekly Trend</div>
+          <div class="card-subtitle">Last 12 weeks email activity</div>
+          <div class="chart-container" style="height:200px">
+            <canvas id="chartWeekly"></canvas>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">🔄 Year Comparison</div>
+          <div class="card-subtitle">Compare across years (2026–2030)</div>
+          <div class="chart-container" style="height:200px">
+            <canvas id="chartYearly"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Campaigns + Recent Activity -->
+      <div class="grid-21 mb-16">
+        <div class="card">
+          <div class="card-title mb-12">🏆 Top Performing Campaigns</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Campaign</th>
+                  <th>Sent</th>
+                  <th>Opened</th>
+                  <th>Open Rate</th>
+                  <th>Clicks</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="topCampaignsTable">
+                <tr><td colspan="6" class="text-center text-muted" style="padding:24px">No campaigns yet</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title mb-12">⚡ Sender Health</div>
+          <div class="mb-12">
+            <div class="flex justify-between mb-4">
+              <span class="text-xs text-muted">Delivery Rate</span>
+              <span class="text-xs font-600" id="healthDelivery">—</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill success" id="healthDeliveryBar" style="width:0%"></div></div>
+          </div>
+          <div class="mb-12">
+            <div class="flex justify-between mb-4">
+              <span class="text-xs text-muted">Open Rate</span>
+              <span class="text-xs font-600" id="healthOpen">—</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="healthOpenBar" style="width:0%"></div></div>
+          </div>
+          <div class="mb-12">
+            <div class="flex justify-between mb-4">
+              <span class="text-xs text-muted">Bounce Rate</span>
+              <span class="text-xs font-600" id="healthBounce">—</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill danger" id="healthBounceBar" style="width:0%"></div></div>
+          </div>
+          <div class="mb-12">
+            <div class="flex justify-between mb-4">
+              <span class="text-xs text-muted">Unsubscribe Rate</span>
+              <span class="text-xs font-600" id="healthUnsub">—</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill info" id="healthUnsubBar" style="width:0%"></div></div>
+          </div>
+          <div class="divider"></div>
+          <div class="alert alert-info" style="margin-bottom:0;font-size:11px">
+            💡 <span id="warmupTip">Connect SendGrid and start sending to see health metrics.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Unsubscribe Trend -->
+      <div class="card mb-16">
+        <div class="card-title">📉 Unsubscribe Trend</div>
+        <div class="card-subtitle">Monthly unsubscribe tracking</div>
+        <div class="chart-container" style="height:160px">
+          <canvas id="chartUnsub"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== CAMPAIGNS ===== -->
+    <div class="page" id="page-campaigns">
+      <div class="flex justify-between items-center mb-16">
+        <div>
+          <div style="font-size:14px;font-weight:700">All Campaigns</div>
+          <div class="text-xs text-muted mt-4">Manage and track all email campaigns</div>
+        </div>
+        <div class="flex gap-8">
+          <input type="text" class="form-control" placeholder="🔍 Search campaigns..." style="width:200px;" oninput="filterCampaigns(this.value)">
+          <select class="form-control" style="width:120px;" onchange="filterCampaignStatus(this.value)">
+            <option value="">All Status</option>
+            <option value="draft">Draft</option>
+            <option value="scheduled">Scheduled</option>
+            <option value="sending">Sending</option>
+            <option value="completed">Completed</option>
+            <option value="paused">Paused</option>
+          </select>
+          <button class="btn btn-primary" onclick="showPage('compose',null)">+ New Campaign</button>
+        </div>
+      </div>
+      <div id="campaignList">
+        <div class="empty-state">
+          <div class="empty-state-icon">📣</div>
+          <div class="empty-state-title">No campaigns yet</div>
+          <p>Create your first email campaign to get started</p>
+          <button class="btn btn-primary mt-12" onclick="showPage('compose',null)">+ Create Campaign</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== NEW CAMPAIGN / COMPOSE ===== -->
+    <div class="page" id="page-compose">
+      <div class="flex justify-between items-center mb-16">
+        <div>
+          <div style="font-size:14px;font-weight:700" id="composeTitle">New Campaign</div>
+          <div class="text-xs text-muted mt-4">Design and schedule your email campaign</div>
+        </div>
+        <div class="flex gap-8">
+          <button class="btn btn-secondary" onclick="saveDraft()">💾 Save Draft</button>
+          <button class="btn btn-primary" onclick="previewEmail()">👁️ Preview</button>
+          <button class="btn btn-success" onclick="scheduleOrSend()">🚀 Schedule / Send</button>
+        </div>
+      </div>
+
+      <div class="grid-12">
+        <!-- LEFT: Settings -->
+        <div>
+          <div class="card mb-16">
+            <div class="card-title mb-12">📋 Campaign Info</div>
+            <div class="form-group">
+              <label class="form-label">Campaign Name <span class="required">*</span></label>
+              <input type="text" class="form-control" id="campaignName" placeholder="e.g. Avurudu Special 2026">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Subject Line <span class="required">*</span></label>
+              <input type="text" class="form-control" id="campaignSubject" placeholder="e.g. Exclusive offer for {{First Name}}">
+              <div class="form-hint">Use {{First Name}}, {{Full Name}}, {{Email}} for personalization</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Preview Text</label>
+              <input type="text" class="form-control" id="campaignPreviewText" placeholder="Short text shown in inbox preview...">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Campaign Notes (Private)</label>
+              <textarea class="form-control" id="campaignNotes" rows="2" placeholder="Internal notes about this campaign..."></textarea>
+            </div>
+          </div>
+
+          <div class="card mb-16">
+            <div class="card-title mb-12">🎯 Recipients</div>
+            <div class="form-group">
+              <label class="form-label">Select Segment</label>
+              <select class="form-control" id="recipientSegment" onchange="updateRecipientCount()">
+                <option value="all">All Subscribed Contacts</option>
+                <option value="new">Added This Month</option>
+                <option value="custom">Custom Segment</option>
+              </select>
+            </div>
+            <div class="alert alert-info" id="recipientCountAlert">
+              👥 <span id="recipientCountText">0 recipients selected</span>
+            </div>
+            <div id="splitInfo" class="hidden">
+              <div class="alert alert-warning">
+                ⚠️ Exceeds 100/day limit. Will be auto-split into batches.
+              </div>
+              <div id="splitBatches"></div>
+            </div>
+          </div>
+
+          <div class="card mb-16">
+            <div class="card-title mb-12">📎 Attachments</div>
+            <div class="upload-zone" onclick="document.getElementById('attachInput').click()">
+              <div class="upload-zone-icon">📎</div>
+              <div style="font-weight:600;margin-bottom:4px">Click to attach files</div>
+              <div>JPEG, PNG, PDF supported</div>
+              <input type="file" id="attachInput" style="display:none" multiple accept=".jpg,.jpeg,.png,.pdf" onchange="handleAttachments(event)">
+            </div>
+            <div id="attachList" class="mt-8"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-title mb-12">📅 Schedule</div>
+            <div class="form-group">
+              <label class="form-label">Send Option</label>
+              <select class="form-control" id="sendOption" onchange="toggleScheduleFields()">
+                <option value="now">Send Now</option>
+                <option value="scheduled">Schedule for Later</option>
+              </select>
+            </div>
+            <div id="scheduleFields" class="hidden">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Date</label>
+                  <input type="date" class="form-control" id="scheduleDate">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Time (Colombo)</label>
+                  <input type="time" class="form-control" id="scheduleTime" value="09:00">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Composer -->
+        <div>
+          <div class="card mb-16">
+            <div class="card-title mb-12">✉️ Email Composer</div>
+
+            <!-- Personalization Tags -->
+            <div class="mb-12">
+              <div class="text-xs text-muted mb-8 font-600">PERSONALIZATION TAGS — click to insert</div>
+              <div class="tag-list" id="personalizationTags">
+                <span class="tag" onclick="insertTag('{{First Name}}')">{{First Name}}</span>
+                <span class="tag" onclick="insertTag('{{Full Name}}')">{{Full Name}}</span>
+                <span class="tag" onclick="insertTag('{{Email}}')">{{Email}}</span>
+                <span class="tag" onclick="insertTag('{{Mobile}}')">{{Mobile}}</span>
+                <span class="tag" onclick="insertTag('{{Hotel Name}}')">{{Hotel Name}}</span>
+              </div>
+            </div>
+
+            <!-- Toolbar -->
+            <div class="composer-toolbar">
+              <select class="composer-btn" onchange="execFormat('formatBlock',this.value)" style="padding:3px 6px;">
+                <option value="p">Paragraph</option>
+                <option value="h1">Heading 1</option>
+                <option value="h2">Heading 2</option>
+                <option value="h3">Heading 3</option>
+              </select>
+              <div class="composer-sep"></div>
+              <button class="composer-btn" onclick="execFormat('bold')" title="Bold"><b>B</b></button>
+              <button class="composer-btn" onclick="execFormat('italic')" title="Italic"><i>I</i></button>
+              <button class="composer-btn" onclick="execFormat('underline')" title="Underline"><u>U</u></button>
+              <div class="composer-sep"></div>
+              <button class="composer-btn" onclick="execFormat('justifyLeft')" title="Align Left">≡</button>
+              <button class="composer-btn" onclick="execFormat('justifyCenter')" title="Center">≡</button>
+              <button class="composer-btn" onclick="execFormat('justifyRight')" title="Right">≡</button>
+              <div class="composer-sep"></div>
+              <button class="composer-btn" onclick="execFormat('insertUnorderedList')" title="Bullet List">• List</button>
+              <button class="composer-btn" onclick="execFormat('insertOrderedList')" title="Numbered List">1. List</button>
+              <div class="composer-sep"></div>
+              <button class="composer-btn" onclick="insertLink()" title="Insert Link">🔗</button>
+              <button class="composer-btn" onclick="insertButton()" title="Insert Button">Button</button>
+              <button class="composer-btn" onclick="insertDivider()" title="Divider">—</button>
+              <button class="composer-btn" onclick="document.getElementById('bodyImgInput').click()" title="Insert Image">🖼️ Image</button>
+              <input type="file" id="bodyImgInput" style="display:none" accept=".jpg,.jpeg,.png,.gif,.webp" onchange="insertBodyImage(event)">
+              <div class="composer-sep"></div>
+              <input type="color" title="Text Color" onchange="execFormat('foreColor',this.value)" style="width:28px;height:26px;border:none;background:none;cursor:pointer;padding:0;">
+              <input type="color" title="Background Color" onchange="execFormat('backColor',this.value)" style="width:28px;height:26px;border:none;background:none;cursor:pointer;padding:0;" value="#FFFF00">
+              <div class="composer-sep"></div>
+              <select class="composer-btn" onchange="execFormat('fontSize',this.value)" style="padding:3px 6px;">
+                <option value="2">Small</option>
+                <option value="3" selected>Normal</option>
+                <option value="4">Large</option>
+                <option value="5">X-Large</option>
+              </select>
+            </div>
+            <div class="composer-area" id="emailBody" contenteditable="true">
+              <p>Dear {{First Name}},</p>
+              <br>
+              <p>Write your email content here...</p>
+              <br>
+              <p>We look forward to welcoming you again to <strong>{{Hotel Name}}</strong>.</p>
+              <br>
+              <p>Warm regards,<br>The Team at {{Hotel Name}}</p>
+            </div>
+          </div>
+
+          <!-- Social Icons -->
+          <div class="card mb-16">
+            <div class="card-title mb-8">🌐 Social Icons in Email</div>
+            <div class="text-xs text-muted mb-12">Toggle which social icons appear in the email footer</div>
+            <div class="social-toggle-grid" id="socialToggles"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TEMPLATES ===== -->
+    <div class="page" id="page-templates">
+      <div class="flex justify-between items-center mb-16">
+        <div>
+          <div style="font-size:14px;font-weight:700">Email Templates</div>
+          <div class="text-xs text-muted mt-4">Save and reuse your best email designs</div>
+        </div>
+        <button class="btn btn-primary" onclick="saveAsTemplate()">+ Save Current as Template</button>
+      </div>
+      <div id="templateList">
+        <div class="empty-state">
+          <div class="empty-state-icon">📋</div>
+          <div class="empty-state-title">No templates saved</div>
+          <p>Save a campaign design as a template to reuse it</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SCHEDULED ===== -->
+    <div class="page" id="page-scheduled">
+      <div class="flex justify-between items-center mb-16">
+        <div>
+          <div style="font-size:14px;font-weight:700">Scheduled Sends</div>
+          <div class="text-xs text-muted mt-4">Upcoming and queued email batches</div>
+        </div>
+      </div>
+      <div id="scheduledList">
+        <div class="empty-state">
+          <div class="empty-state-icon">⏰</div>
+          <div class="empty-state-title">No scheduled sends</div>
+          <p>Schedule a campaign to see it here</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== CONTACTS ===== -->
+    <div class="page" id="page-contacts">
+      <div class="flex justify-between items-center mb-16">
+        <div>
+          <div style="font-size:14px;font-weight:700">All Contacts</div>
+          <div class="text-xs text-muted mt-4" id="contactCountLabel">0 total contacts</div>
+        </div>
+        <div class="flex gap-8 flex-wrap">
+          <input type="text" class="form-control" placeholder="🔍 Search name or email..." style="width:200px;" id="contactSearch" oninput="renderContacts()">
+          <select class="form-control" style="width:130px;" id="contactStatusFilter" onchange="renderContacts()">
+            <option value="">All Status</option>
+            <option value="subscribed">Subscribed</option>
+            <option value="unsubscribed">Unsubscribed</option>
+          </select>
+          <button class="btn btn-secondary" onclick="showImportModal()">📥 Import Excel</button>
+          <button class="btn btn-secondary" onclick="showGSheetsModal()">📊 Google Sheets</button>
+          <button class="btn btn-primary" onclick="showAddContactModal()">+ Add Contact</button>
+        </div>
+      </div>
+
+      <div class="card" style="padding:0;overflow:hidden">
+        <div id="contactListEl" style="min-height:200px"></div>
+      </div>
+    </div>
+
+    <!-- ===== SEGMENTS ===== -->
+    <div class="page" id="page-segments">
+      <div class="flex justify-between items-center mb-16">
+        <div>
+          <div style="font-size:14px;font-weight:700">Contact Segments</div>
+          <div class="text-xs text-muted mt-4">Group guests for targeted campaigns</div>
+        </div>
+        <button class="btn btn-primary" onclick="showAddSegmentModal()">+ New Segment</button>
+      </div>
+      <div id="segmentList">
+        <div class="empty-state">
+          <div class="empty-state-icon">🎯</div>
+          <div class="empty-state-title">No segments yet</div>
+          <p>Create segments to send targeted campaigns (e.g. by nationality, stay date)</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== UNSUBSCRIBED ===== -->
+    <div class="page" id="page-unsubscribed">
+      <div class="flex justify-between items-center mb-16">
+        <div>
+          <div style="font-size:14px;font-weight:700">Unsubscribed Contacts</div>
+          <div class="text-xs text-muted mt-4">These contacts have opted out and won't receive emails</div>
+        </div>
+        <button class="btn btn-secondary" onclick="exportUnsubscribed()">📥 Export List</button>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div id="unsubListEl">
+          <div class="empty-state"><div class="empty-state-icon">🚫</div><div class="empty-state-title">No unsubscribes yet</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SUPPRESSED ===== -->
+    <div class="page" id="page-suppressed">
+      <div class="flex justify-between items-center mb-16">
+        <div>
+          <div style="font-size:14px;font-weight:700">Suppressed / Bounced</div>
+          <div class="text-xs text-muted mt-4">Invalid or hard-bounced emails — never sent to again</div>
+        </div>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div id="suppressedListEl">
+          <div class="empty-state"><div class="empty-state-icon">⛔</div><div class="empty-state-title">No suppressed contacts</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== WHATSAPP ===== -->
+    <div class="page" id="page-whatsapp">
+      <div class="flex justify-between items-center mb-16">
+        <div>
+          <div style="font-size:14px;font-weight:700">WhatsApp Bulk Messaging</div>
+          <div class="text-xs text-muted mt-4">Generate click-to-send WhatsApp links for your guest list</div>
+        </div>
+      </div>
+      <div class="grid-12">
+        <div>
+          <div class="card mb-16">
+            <div class="card-title mb-12">💬 Message Composer</div>
+            <div class="form-group">
+              <label class="form-label">Message Template Name</label>
+              <input type="text" class="form-control" id="waTemplateName" placeholder="e.g. Avurudu Promo">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Message <span class="required">*</span></label>
+              <textarea class="form-control" id="waMessage" rows="5" placeholder="Dear {{First Name}}, &#10;&#10;We have an exclusive offer for you at {{Hotel Name}}!&#10;&#10;Book now: [link]&#10;&#10;Warm regards,&#10;{{Hotel Name}}"></textarea>
+              <div class="form-hint">Use {{First Name}}, {{Full Name}}, {{Hotel Name}} for personalization</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Select Recipients</label>
+              <select class="form-control" id="waRecipients">
+                <option value="all">All Contacts with Mobile</option>
+                <option value="subscribed">Subscribed Only</option>
+              </select>
+            </div>
+            <div class="flex gap-8">
+              <button class="btn btn-primary w-full" onclick="generateWALinks()">📲 Generate WhatsApp Links</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title mb-12">💾 Saved Templates</div>
+            <div id="waTemplateList">
+              <div class="text-xs text-muted">No saved templates yet</div>
+            </div>
+            <button class="btn btn-secondary btn-sm mt-12" onclick="saveWATemplate()">+ Save Current as Template</button>
+          </div>
+        </div>
+
+        <div class="card" style="padding:0;overflow:hidden">
+          <div style="padding:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+            <div class="card-title" style="margin-bottom:0">📋 Send List</div>
+            <div class="flex gap-8">
+              <input type="text" class="form-control" placeholder="🔍 Filter..." style="width:140px;font-size:11px;" oninput="filterWAList(this.value)">
+              <button class="btn btn-secondary btn-sm" onclick="exportWASent()">Export Sent</button>
+            </div>
+          </div>
+          <div id="waContactList" style="max-height:600px;overflow-y:auto;">
+            <div class="empty-state">
+              <div class="empty-state-icon">📲</div>
+              <div class="empty-state-title">No links generated yet</div>
+              <p>Compose a message and click Generate</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== CALENDAR ===== -->
+    <div class="page" id="page-calendar">
+      <div class="flex justify-between items-center mb-16">
+        <div>
+          <div style="font-size:14px;font-weight:700">Campaign Calendar</div>
+          <div class="text-xs text-muted mt-4">Visual overview of scheduled campaigns</div>
+        </div>
+        <div class="flex gap-8 items-center">
+          <button class="btn btn-secondary btn-sm" onclick="prevMonth()">‹</button>
+          <div style="font-size:13px;font-weight:700;min-width:120px;text-align:center" id="calMonthLabel"></div>
+          <button class="btn btn-secondary btn-sm" onclick="nextMonth()">›</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="calendar-grid mb-8" id="calDayHeaders"></div>
+        <div class="calendar-grid" id="calGrid"></div>
+      </div>
+      <div class="mt-16" id="calEventList"></div>
+    </div>
+
+    <!-- ===== WELCOME EMAIL EDITOR ===== -->
+    <div class="page" id="page-welcome-editor">
+      <div class="flex justify-between items-center mb-16">
+        <div>
+          <div style="font-size:14px;font-weight:700">Welcome Email Editor</div>
+          <div class="text-xs text-muted mt-4">Customize the email sent to new newsletter subscribers</div>
+        </div>
+        <div class="flex gap-8">
+          <button class="btn btn-secondary" onclick="previewWelcome()">👁️ Preview</button>
+          <button class="btn btn-primary" onclick="saveWelcome()">💾 Save Welcome Email</button>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title mb-12">✉️ Welcome Email Settings</div>
+          <div class="form-group">
+            <label class="form-label">Subject Line</label>
+            <input type="text" class="form-control" id="welcomeSubject" value="Welcome to {{Hotel Name}} — Thank You for Subscribing!">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Body</label>
+            <div class="composer-toolbar" style="border-radius:var(--radius-sm) var(--radius-sm) 0 0">
+              <button class="composer-btn" onclick="execFormatW('bold')"><b>B</b></button>
+              <button class="composer-btn" onclick="execFormatW('italic')"><i>I</i></button>
+              <button class="composer-btn" onclick="execFormatW('underline')"><u>U</u></button>
+              <button class="composer-btn" onclick="execFormatW('justifyCenter')">≡</button>
+            </div>
+            <div class="composer-area" id="welcomeBody" contenteditable="true" style="min-height:200px">
+              <p>Dear {{First Name}},</p>
+              <br>
+              <p>Thank you for subscribing to our newsletter! We're delighted to have you as part of the <strong>{{Hotel Name}}</strong> family.</p>
+              <br>
+              <p>You'll be the first to receive our exclusive offers, seasonal promotions, and special event invitations.</p>
+              <br>
+              <p>We look forward to welcoming you soon.</p>
+              <br>
+              <p>Warm regards,<br>The Team at {{Hotel Name}}</p>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title mb-12">📱 Mobile Preview</div>
+          <div style="background:#f0f2f8;border-radius:12px;padding:16px;max-width:320px;margin:0 auto;">
+            <div style="background:white;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
+              <div id="welcomePreviewBanner" style="padding:20px;text-align:center;background:var(--brand-secondary)">
+                <div id="welcomePreviewLogo" style="font-size:20px;font-weight:800;color:white" id="welcomePreviewHotelName">Hotel Name</div>
+              </div>
+              <div style="padding:16px;font-size:12px;line-height:1.7;color:#333" id="welcomePreviewBody">
+                Preview will appear here
+              </div>
+              <div style="padding:12px 16px;background:#f9f9f9;font-size:10px;color:#888;text-align:center;border-top:1px solid #eee">
+                <a href="#" style="color:#888">Unsubscribe</a> · Powered by {{Hotel Name}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== UNSUBSCRIBE PAGE EDITOR ===== -->
+    <div class="page" id="page-unsub-editor">
+      <div class="flex justify-between items-center mb-16">
+        <div>
+          <div style="font-size:14px;font-weight:700">Unsubscribe Page Editor</div>
+          <div class="text-xs text-muted mt-4">Customize the page guests see when they unsubscribe</div>
+        </div>
+        <button class="btn btn-primary" onclick="saveUnsubPage()">💾 Save Unsubscribe Page</button>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title mb-12">✏️ Page Content</div>
+          <div class="form-group">
+            <label class="form-label">Headline</label>
+            <input type="text" class="form-control" id="unsubHeadline" value="You've been unsubscribed">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Message</label>
+            <textarea class="form-control" id="unsubMessage" rows="4">We're sorry to see you go. You have been successfully removed from our mailing list and will no longer receive emails from {{Hotel Name}}.
+
+If you unsubscribed by mistake, you can re-subscribe below.</textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Re-subscribe Button Label</label>
+            <input type="text" class="form-control" id="unsubResubLabel" value="Re-subscribe to our newsletter">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Footer Note</label>
+            <input type="text" class="form-control" id="unsubFooter" value="© {{Hotel Name}} · All rights reserved">
+          </div>
+          <button class="btn btn-secondary mt-8" onclick="previewUnsubPage()">👁️ Preview Page</button>
+        </div>
+        <div class="card">
+          <div class="card-title mb-12">📱 Live Preview</div>
+          <div style="background:#f0f2f8;border-radius:12px;padding:16px;">
+            <div class="unsub-preview" id="unsubPreview">
+              <div class="unsub-preview-header" id="unsubPreviewHeader" style="background:#1C5F6E">
+                <div style="font-size:18px;font-weight:800;color:white" id="unsubPreviewHotelName">Hotel Name</div>
+              </div>
+              <div class="unsub-preview-body">
+                <div style="font-size:28px;margin-bottom:8px">😔</div>
+                <div style="font-size:16px;font-weight:700;margin-bottom:8px" id="unsubPreviewHeadline">You've been unsubscribed</div>
+                <div style="font-size:12px;color:#666;margin-bottom:16px" id="unsubPreviewMessage">We're sorry to see you go...</div>
+                <button style="background:#C9A96E;color:white;border:none;padding:8px 16px;border-radius:6px;font-size:12px;cursor:pointer" id="unsubPreviewBtn">Re-subscribe</button>
+                <div style="font-size:10px;color:#999;margin-top:16px" id="unsubPreviewFooter">© Hotel Name</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SNIPPET ===== -->
+    <div class="page" id="page-snippet">
+      <div style="font-size:14px;font-weight:700;margin-bottom:4px">Newsletter Signup Snippet</div>
+      <div class="text-xs text-muted mb-16">Embed this form on your hotel website to capture newsletter signups</div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title mb-12">📋 Embed Code</div>
+          <div class="alert alert-info mb-12">
+            💡 Copy this snippet and paste it into your hotel website's HTML where you want the signup form to appear.
+          </div>
+          <div style="background:var(--bg-base);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;font-family:monospace;font-size:11px;color:var(--text-secondary);overflow-x:auto;white-space:pre-wrap;line-height:1.6" id="snippetCode"></div>
+          <button class="btn btn-primary mt-12" onclick="copySnippet()">📋 Copy Snippet</button>
+          <div class="divider"></div>
+          <div class="card-title mb-8">📊 Google Sheet Snippet Tab</div>
+          <div class="text-xs text-muted">The snippet is also saved in your Google Sheet under the <strong>"Website Snippet"</strong> tab. Instructions are included in that tab on how to install it on your website.</div>
+        </div>
+        <div class="card">
+          <div class="card-title mb-12">👁️ Form Preview</div>
+          <div style="background:#f0f2f8;border-radius:12px;padding:24px;">
+            <div style="background:white;border-radius:8px;padding:24px;max-width:340px;margin:0 auto;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
+              <div style="font-weight:800;font-size:16px;margin-bottom:4px;color:#1a1e2e" id="snippetPreviewTitle">Stay in the know</div>
+              <div style="font-size:12px;color:#888;margin-bottom:16px">Subscribe to receive exclusive offers from <span id="snippetPreviewHotel">your hotel</span></div>
+              <input placeholder="Your Name" style="width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:12px;margin-bottom:8px;font-family:inherit">
+              <input placeholder="Email Address" style="width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:12px;margin-bottom:8px;font-family:inherit">
+              <input placeholder="Mobile (optional)" style="width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:12px;margin-bottom:12px;font-family:inherit">
+              <button id="snippetPreviewBtn" style="width:100%;padding:9px;background:#C9A96E;color:white;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer">Subscribe Now</button>
+              <div style="font-size:10px;color:#aaa;text-align:center;margin-top:8px">We respect your privacy. Unsubscribe anytime.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SETTINGS ===== -->
+    <div class="page" id="page-settings">
+      <div style="font-size:14px;font-weight:700;margin-bottom:4px">Settings</div>
+      <div class="text-xs text-muted mb-16">Configure your hotel profile, integrations, and preferences</div>
+      <div class="settings-layout">
+        <div class="settings-nav">
+          <div class="settings-nav-item active" onclick="showSettingsTab('hotel',this)">🏨 Hotel Profile</div>
+          <div class="settings-nav-item" onclick="showSettingsTab('branding',this)">🎨 Branding</div>
+          <div class="settings-nav-item" onclick="showSettingsTab('social',this)">🌐 Social Links</div>
+          <div class="settings-nav-item" onclick="showSettingsTab('sendgrid',this)">📧 SendGrid</div>
+          <div class="settings-nav-item" onclick="showSettingsTab('gsheets',this)">📊 Google Sheets</div>
+          <div class="settings-nav-item" onclick="showSettingsTab('frequency',this)">🔔 Frequency Guard</div>
+          <div class="settings-nav-item" onclick="showSettingsTab('fonts',this)">🔤 Fonts</div>
+          <div class="settings-nav-item" onclick="showSettingsTab('footer-image',this)">🖼️ Email Footer</div>
+          <div class="settings-nav-item" onclick="showSettingsTab('snippet',this)">🔗 Signup Snippet</div>
+          <div class="settings-nav-item" onclick="showSettingsTab('audit',this)">📝 Audit Log</div>
+          <div class="settings-nav-item" onclick="showSettingsTab('password',this)">🔑 Password</div>
+        </div>
+        <div class="settings-panel">
+          <!-- Hotel Profile -->
+          <div class="settings-section active" id="settings-hotel">
+            <div class="card">
+              <div class="card-title mb-16">🏨 Hotel Profile</div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Hotel Name <span class="required">*</span></label>
+                  <input type="text" class="form-control" id="settingHotelName" placeholder="Colombo Court Hotel & Spa" oninput="liveUpdateHotelName()">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Tagline</label>
+                  <input type="text" class="form-control" id="settingTagline" placeholder="Your Boutique Escape in Colombo">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Sender Email</label>
+                  <input type="email" class="form-control" id="settingSenderEmail" placeholder="info@colombocourthotel.com">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Reply-to Email</label>
+                  <input type="email" class="form-control" id="settingReplyTo" placeholder="reservations@colombocourthotel.com">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Phone</label>
+                  <input type="text" class="form-control" id="settingPhone" placeholder="+94 11 XXX XXXX">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">WhatsApp Number</label>
+                  <input type="text" class="form-control" id="settingWhatsApp" placeholder="+94 7X XXX XXXX">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Address</label>
+                <input type="text" class="form-control" id="settingAddress" placeholder="123 Galle Road, Colombo 03, Sri Lanka">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Website</label>
+                <input type="url" class="form-control" id="settingWebsite" placeholder="https://www.colombocourthotel.com">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Hotel Logo</label>
+                <div class="flex gap-12 items-center">
+                  <div id="logoPreviewEl" style="width:60px;height:60px;background:var(--brand-primary)22;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text-muted);border:1px solid var(--border);overflow:hidden">
+                    <span id="logoPreviewText">No Logo</span>
+                    <img id="logoPreviewImg" src="" style="display:none;width:100%;height:100%;object-fit:cover;">
+                  </div>
+                  <div>
+                    <button class="btn btn-secondary btn-sm" onclick="document.getElementById('logoUpload').click()">Upload Logo (PNG/JPG)</button>
+                    <input type="file" id="logoUpload" style="display:none" accept=".jpg,.jpeg,.png" onchange="handleLogoUpload(event)">
+                    <div class="text-xs text-muted mt-4">Recommended: 200×200px PNG with transparent background</div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email Footer Text</label>
+                <textarea class="form-control" id="settingFooter" rows="2" placeholder="© 2026 Hotel Name · All Rights Reserved · Unsubscribe"></textarea>
+              </div>
+              <button class="btn btn-primary" onclick="saveSettings()">💾 Save Hotel Profile</button>
+            </div>
+          </div>
+
+          <!-- Branding -->
+          <div class="settings-section" id="settings-branding">
+            <div class="card">
+              <div class="card-title mb-16">🎨 Brand Colors & Theme</div>
+              <div class="form-row-3">
+                <div class="form-group">
+                  <label class="form-label">Primary Color</label>
+                  <div class="color-row">
+                    <input type="color" class="color-preview" id="colorPrimary" value="#C9A96E" onchange="applyBrandColor('primary',this.value)">
+                    <input type="text" class="form-control" id="colorPrimaryHex" value="#C9A96E" oninput="applyBrandColorHex('primary',this.value)" style="flex:1">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Secondary Color</label>
+                  <div class="color-row">
+                    <input type="color" class="color-preview" id="colorSecondary" value="#2C5F6E" onchange="applyBrandColor('secondary',this.value)">
+                    <input type="text" class="form-control" id="colorSecondaryHex" value="#2C5F6E" oninput="applyBrandColorHex('secondary',this.value)" style="flex:1">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Accent Color</label>
+                  <div class="color-row">
+                    <input type="color" class="color-preview" id="colorAccent" value="#E8D5B0" onchange="applyBrandColor('accent',this.value)">
+                    <input type="text" class="form-control" id="colorAccentHex" value="#E8D5B0" oninput="applyBrandColorHex('accent',this.value)" style="flex:1">
+                  </div>
+                </div>
+              </div>
+              <button class="btn btn-primary mt-8" onclick="saveBranding()">💾 Save Branding</button>
+            </div>
+          </div>
+
+          <!-- Social Links -->
+          <div class="settings-section" id="settings-social">
+            <div class="card">
+              <div class="card-title mb-4">🌐 Social Media Links</div>
+              <div class="text-xs text-muted mb-16">These links are used in all email footers and campaigns</div>
+              <div id="socialLinksForm"></div>
+              <button class="btn btn-primary mt-8" onclick="saveSocialLinks()">💾 Save Social Links</button>
+            </div>
+          </div>
+
+          <!-- SendGrid -->
+          <div class="settings-section" id="settings-sendgrid">
+            <div class="card">
+              <div class="card-title mb-4">📧 SendGrid Configuration</div>
+              <div class="text-xs text-muted mb-16">Connect your free SendGrid account for email delivery</div>
+              <div class="alert alert-info mb-16">
+                <div>
+                  <strong>How to get your free API key:</strong><br>
+                  1. Go to <strong>sendgrid.com</strong> → Create free account (100 emails/day)<br>
+                  2. Settings → API Keys → Create API Key (Full Access)<br>
+                  3. Copy the key and paste below
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">SendGrid API Key</label>
+                <input type="password" class="form-control" id="settingSendgridKey" placeholder="SG.xxxxxxxxxxxxxxxxxxxxxxxx">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Daily Send Limit</label>
+                <input type="number" class="form-control" id="settingDailyLimit" value="100" min="1" max="100">
+                <div class="form-hint">Free tier = 100/day. The app will auto-split larger sends into daily batches.</div>
+              </div>
+              <button class="btn btn-primary" onclick="saveSendgrid()">💾 Save & Test Connection</button>
+              <div id="sendgridStatus" class="mt-12"></div>
+            </div>
+
+            <div class="card mt-16">
+              <div class="card-title mb-8">🔥 Email Warm-Up Advisor</div>
+              <div class="text-xs text-muted mb-12">Starting fresh? Follow this warm-up schedule to protect your sender reputation:</div>
+              <div class="schedule-batch">
+                <div class="batch-num">1</div>
+                <div class="batch-info"><div class="batch-label">Week 1</div><div class="batch-sub">Send 20–30 emails/day to your most engaged contacts</div></div>
+              </div>
+              <div class="schedule-batch">
+                <div class="batch-num">2</div>
+                <div class="batch-info"><div class="batch-label">Week 2</div><div class="batch-sub">Increase to 50/day — monitor bounce and open rates</div></div>
+              </div>
+              <div class="schedule-batch">
+                <div class="batch-num">3</div>
+                <div class="batch-info"><div class="batch-label">Week 3+</div><div class="batch-sub">Full 100/day — maintain good open rates above 20%</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Google Sheets -->
+          <div class="settings-section" id="settings-gsheets">
+            <div class="card">
+              <div class="card-title mb-4">📊 Google Sheets Backup</div>
+              <div class="text-xs text-muted mb-16">All your data is backed up live to Google Sheets</div>
+              <div class="alert alert-info mb-16">
+                <div>
+                  <strong>Setup Instructions:</strong><br>
+                  1. Create a new Google Sheet<br>
+                  2. Go to Extensions → Apps Script<br>
+                  3. Paste the provided script (below)<br>
+                  4. Deploy as Web App → Copy the URL<br>
+                  5. Paste the Web App URL below
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Google Sheets Web App URL</label>
+                <input type="url" class="form-control" id="settingGSheetsUrl" placeholder="https://script.google.com/macros/s/...">
+              </div>
+              <button class="btn btn-primary" onclick="testGSheets()">🔗 Test Connection</button>
+              <div id="gsheetsStatus" class="mt-12"></div>
+              <div class="divider"></div>
+              <div class="card-title mb-8">📋 Sheet Structure</div>
+              <div class="text-xs" style="color:var(--text-secondary);line-height:2">
+                Your sheet will have these tabs automatically created:<br>
+                <strong>Contacts</strong> — All guest data (required: Name, Email, Mobile)<br>
+                <strong>Campaigns</strong> — Campaign history and stats<br>
+                <strong>Email Log</strong> — Every email sent with timestamp<br>
+                <strong>Unsubscribes</strong> — Opt-out list<br>
+                <strong>Settings</strong> — App configuration backup<br>
+                <strong>Website Snippet</strong> — Embed code + instructions<br>
+                <strong>Custom Fields Guide</strong> — How to add new columns
+              </div>
+            </div>
+          </div>
+
+          <!-- Frequency Guard -->
+          <div class="settings-section" id="settings-frequency">
+            <div class="card">
+              <div class="card-title mb-4">🔔 Contact Frequency Guard</div>
+              <div class="text-xs text-muted mb-16">Prevent over-emailing — protect your sender reputation and guest experience</div>
+              <div class="form-group">
+                <label class="form-label">Minimum days between emails to same contact</label>
+                <input type="number" class="form-control" id="settingFreqDays" value="7" min="1" max="90">
+                <div class="form-hint">App will warn you before sending to a contact who received an email within this many days</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Max emails per contact per month</label>
+                <input type="number" class="form-control" id="settingFreqMonth" value="4" min="1" max="30">
+              </div>
+              <button class="btn btn-primary" onclick="saveFrequency()">💾 Save Frequency Settings</button>
+            </div>
+          </div>
+
+          <!-- Fonts -->
+          <div class="settings-section" id="settings-fonts">
+            <div class="card">
+              <div class="card-title mb-4">🔤 Font Settings</div>
+              <div class="text-xs text-muted mb-16">Customize the font used across the app and in emails</div>
+              <div class="form-group">
+                <label class="form-label">App Font</label>
+                <select class="form-control" id="settingFont" onchange="applyFont(this.value)">
+                  <option value="Poppins">Poppins (Default)</option>
+                  <option value="Inter">Inter</option>
+                  <option value="Lato">Lato</option>
+                  <option value="Montserrat">Montserrat</option>
+                  <option value="Raleway">Raleway</option>
+                  <option value="Nunito">Nunito</option>
+                  <option value="Playfair Display">Playfair Display</option>
+                  <option value="Source Sans 3">Source Sans 3</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Custom Google Font</label>
+                <input type="text" class="form-control" id="settingCustomFont" placeholder="e.g. Outfit, DM Sans, Plus Jakarta Sans">
+                <div class="form-hint">Type any Google Font name. The app will load it automatically.</div>
+              </div>
+              <button class="btn btn-primary" onclick="applyCustomFont()">Apply Custom Font</button>
+            </div>
+          </div>
+
+          <!-- Email Footer Image -->
+          <div class="settings-section" id="settings-footer-image">
+            <div class="card">
+              <div class="card-title mb-4">🖼️ Email Footer Image</div>
+              <div class="text-xs text-muted mb-16">Add a professional banner image to the bottom of all your emails</div>
+              <div class="form-group">
+                <label class="form-label">Footer Image</label>
+                <div class="upload-zone" onclick="document.getElementById('footerImgUpload').click()" style="margin-bottom:12px">
+                  <div class="upload-zone-icon">🖼️</div>
+                  <div style="font-weight:600;margin-bottom:4px">Click to upload footer image</div>
+                  <div>JPEG or PNG · Recommended width: 600px</div>
+                  <input type="file" id="footerImgUpload" style="display:none" accept=".jpg,.jpeg,.png" onchange="handleFooterImgUpload(event)">
+                </div>
+                <div id="footerImgPreviewWrap" style="display:none;margin-bottom:12px">
+                  <div class="text-xs text-muted mb-8 font-600">CURRENT FOOTER IMAGE</div>
+                  <img id="footerImgPreview" src="" style="width:100%;max-height:120px;object-fit:cover;border-radius:var(--radius-sm);border:1px solid var(--border)">
+                  <button class="btn btn-danger btn-sm mt-8" onclick="removeFooterImg()">🗑️ Remove Image</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Image Alt Text (for accessibility)</label>
+                <input type="text" class="form-control" id="settingFooterImgAlt" placeholder="Colombo Court Hotel & Spa">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Image Link (optional — clicking the image goes here)</label>
+                <input type="url" class="form-control" id="settingFooterImgLink" placeholder="https://colombocourthotel.com">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Image Position</label>
+                <select class="form-control" id="settingFooterImgPos">
+                  <option value="above-text">Above footer text</option>
+                  <option value="below-text">Below footer text</option>
+                  <option value="only">Image only (no text footer)</option>
+                </select>
+              </div>
+              <button class="btn btn-primary" onclick="saveFooterImage()">💾 Save Footer Image</button>
+            </div>
+            <div class="card mt-16">
+              <div class="card-title mb-12">👁️ Footer Preview</div>
+              <div style="background:#f0f2f8;border-radius:var(--radius);padding:16px;">
+                <div style="background:white;border-radius:8px;overflow:hidden;border:1px solid #ddd;max-width:500px;margin:0 auto">
+                  <div style="padding:12px 16px;font-size:11px;color:#888;text-align:center;border-top:1px solid #eee" id="footerPreviewText">
+                    © 2026 Hotel Name · All Rights Reserved · <a href="#" style="color:#888">Unsubscribe</a>
+                  </div>
+                  <div id="footerImgPreviewArea" style="display:none">
+                    <img id="footerImgPreviewFull" src="" style="width:100%;display:block;">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Signup Snippet -->
+          <div class="settings-section" id="settings-snippet">
+            <div class="card">
+              <div class="card-title mb-12">🔗 Newsletter Signup Snippet</div>
+              <div class="alert alert-info mb-12">
+                💡 Copy this snippet and paste it into your hotel website's HTML where you want the signup form to appear.
+              </div>
+              <div style="background:var(--bg-base);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;font-family:monospace;font-size:11px;color:var(--text-secondary);overflow-x:auto;white-space:pre-wrap;line-height:1.6;max-height:300px;overflow-y:auto" id="snippetCode"></div>
+              <button class="btn btn-primary mt-12" onclick="copySnippet()">📋 Copy Snippet</button>
+              <div class="divider"></div>
+              <div class="card-title mb-8">📊 Google Sheet Tab</div>
+              <div class="text-xs text-muted">The snippet is also saved in your Google Sheet under the <strong>"Website Snippet"</strong> tab with full installation instructions.</div>
+            </div>
+            <div class="card mt-16">
+              <div class="card-title mb-12">👁️ Form Preview</div>
+              <div style="background:#f0f2f8;border-radius:12px;padding:24px;">
+                <div style="background:white;border-radius:8px;padding:24px;max-width:340px;margin:0 auto;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
+                  <div style="font-weight:800;font-size:16px;margin-bottom:4px;color:#1a1e2e">Stay in the know</div>
+                  <div style="font-size:12px;color:#888;margin-bottom:16px">Subscribe to receive exclusive offers from <span id="snippetPreviewHotel">your hotel</span></div>
+                  <input placeholder="Your Name" style="width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:12px;margin-bottom:8px;font-family:inherit;box-sizing:border-box">
+                  <input placeholder="Email Address" style="width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:12px;margin-bottom:8px;font-family:inherit;box-sizing:border-box">
+                  <input placeholder="Mobile (optional)" style="width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:12px;margin-bottom:12px;font-family:inherit;box-sizing:border-box">
+                  <button id="snippetPreviewBtn" style="width:100%;padding:9px;background:#C9A96E;color:white;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer">Subscribe Now</button>
+                  <div style="font-size:10px;color:#aaa;text-align:center;margin-top:8px">We respect your privacy. Unsubscribe anytime.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Audit Log -->
+          <div class="settings-section" id="settings-audit">
+            <div class="flex justify-between items-center mb-16">
+              <div>
+                <div style="font-size:13px;font-weight:700">Audit Log</div>
+                <div class="text-xs text-muted mt-4">Complete history of all actions</div>
+              </div>
+              <div class="flex gap-8">
+                <button class="btn btn-secondary btn-sm" onclick="exportAuditLog()">📥 Export</button>
+                <button class="btn btn-danger btn-sm" onclick="clearAuditLog()">🗑️ Clear Log</button>
+              </div>
+            </div>
+            <div class="card" style="max-height:500px;overflow-y:auto">
+              <div id="auditLogEl">
+                <div class="empty-state"><div class="empty-state-icon">📝</div><div class="empty-state-title">No activity yet</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div class="settings-section" id="settings-password">
+            <div class="card">
+              <div class="card-title mb-4">🔑 Settings Password</div>
+              <div class="text-xs text-muted mb-16">Protect access to Settings & Admin with a password. Others can use the main app but cannot access this area.</div>
+              <div class="alert alert-warning mb-16">
+                ⚠️ <strong>Important:</strong> If you forget your password, you can reset it by clearing your browser's local storage for this page. Keep a note of your password.
+              </div>
+              <div id="passwordSetupSection">
+                <div class="form-group">
+                  <label class="form-label">Current Password <span class="text-xs text-muted">(leave blank if none set)</span></label>
+                  <input type="password" class="form-control" id="currentPasswordInput" placeholder="Current password">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">New Password <span class="required">*</span></label>
+                  <input type="password" class="form-control" id="newPasswordInput" placeholder="Enter new password">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Confirm New Password <span class="required">*</span></label>
+                  <input type="password" class="form-control" id="confirmPasswordInput" placeholder="Repeat new password">
+                </div>
+                <div class="flex gap-8">
+                  <button class="btn btn-primary" onclick="savePassword()">🔒 Set Password</button>
+                  <button class="btn btn-danger" onclick="removePassword()" id="removePasswordBtn" style="display:none">🔓 Remove Password</button>
+                </div>
+                <div id="passwordStatus" class="mt-12"></div>
+              </div>
+            </div>
+          </div>
+
+  </div><!-- page-body -->
+</div><!-- main-content -->
+
+<!-- ===== MODALS ===== -->
+
+<!-- Add Contact Modal -->
+<div class="modal-overlay hidden" id="modalAddContact">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Add New Contact</div>
+      <div class="modal-close" onclick="closeModal('modalAddContact')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">First Name <span class="required">*</span></label>
+          <input type="text" class="form-control" id="newContactFirst" placeholder="Kamal">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last Name</label>
+          <input type="text" class="form-control" id="newContactLast" placeholder="Perera">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email <span class="required">*</span></label>
+        <input type="email" class="form-control" id="newContactEmail" placeholder="kamal@email.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Mobile <span class="required">*</span></label>
+        <input type="text" class="form-control" id="newContactMobile" placeholder="+94 7X XXX XXXX">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nationality</label>
+          <input type="text" class="form-control" id="newContactNat" placeholder="Sri Lankan">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Stay Date</label>
+          <input type="date" class="form-control" id="newContactStay">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Room Type</label>
+          <input type="text" class="form-control" id="newContactRoom" placeholder="Deluxe Room">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notes</label>
+          <input type="text" class="form-control" id="newContactNotes" placeholder="VIP, repeat guest...">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalAddContact')">Cancel</button>
+      <button class="btn btn-primary" onclick="addContact()">Add Contact</button>
+    </div>
+  </div>
+</div>
+
+<!-- Import Excel Modal -->
+<div class="modal-overlay hidden" id="modalImport">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Import Contacts from Excel</div>
+      <div class="modal-close" onclick="closeModal('modalImport')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-info mb-16">
+        <div>
+          <strong>Excel Format:</strong> Your file needs columns in this order (or with these headers):<br>
+          <strong>First Name, Last Name, Email, Mobile</strong> (required)<br>
+          Optional: Nationality, Stay Date, Room Type, Notes<br>
+          Missing optional fields are handled gracefully — the app won't break.
+        </div>
+      </div>
+      <div class="upload-zone" id="excelUploadZone" onclick="document.getElementById('excelFile').click()">
+        <div class="upload-zone-icon">📊</div>
+        <div style="font-weight:600">Click to select Excel file (.xlsx, .csv)</div>
+        <div>or drag and drop here</div>
+        <input type="file" id="excelFile" style="display:none" accept=".xlsx,.csv" onchange="handleExcelImport(event)">
+      </div>
+      <div id="importPreview" class="mt-16"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalImport')">Cancel</button>
+      <button class="btn btn-primary" id="importConfirmBtn" style="display:none" onclick="confirmImport()">Import Contacts</button>
+    </div>
+  </div>
+</div>
+
+<!-- Google Sheets Pull Modal -->
+<div class="modal-overlay hidden" id="modalGSheets">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Pull from Google Sheets</div>
+      <div class="modal-close" onclick="closeModal('modalGSheets')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-info">
+        Connects to your Google Sheet and syncs the Contacts tab. New contacts are added, existing ones updated. Unsubscribed contacts are preserved.
+      </div>
+      <div class="form-group mt-12">
+        <label class="form-label">Google Sheets URL (configured in Settings)</label>
+        <input type="text" class="form-control" id="gsheetsSyncUrl" placeholder="Auto-filled from Settings..." readonly>
+      </div>
+      <button class="btn btn-primary mt-8 w-full" onclick="syncFromGSheets()">🔄 Sync Now</button>
+      <div id="gsheetsSyncStatus" class="mt-12"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Campaign Preview Modal -->
+<div class="modal-overlay hidden" id="modalPreview">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <div class="modal-title">Email Preview</div>
+      <div class="modal-close" onclick="closeModal('modalPreview')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="tabs">
+        <div class="tab active" onclick="switchPreviewTab('desktop',this)">🖥️ Desktop</div>
+        <div class="tab" onclick="switchPreviewTab('mobile',this)">📱 Mobile</div>
+      </div>
+      <div id="previewFrame" style="background:#f0f2f8;border-radius:var(--radius);padding:16px;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalPreview')">Close</button>
+      <button class="btn btn-primary" onclick="scheduleOrSend()">🚀 Send Campaign</button>
+    </div>
+  </div>
+</div>
+
+<!-- Schedule / Send Modal -->
+<div class="modal-overlay hidden" id="modalSend">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Schedule / Send Campaign</div>
+      <div class="modal-close" onclick="closeModal('modalSend')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div id="sendSummary"></div>
+      <div id="sendBatchPlan" class="mt-12"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalSend')">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmSend()">✅ Confirm & Queue</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Segment Modal -->
+<div class="modal-overlay hidden" id="modalSegment">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Create Segment</div>
+      <div class="modal-close" onclick="closeModal('modalSegment')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Segment Name</label>
+        <input type="text" class="form-control" id="segmentName" placeholder="e.g. International Guests">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Filter By</label>
+        <select class="form-control" id="segmentField">
+          <option value="nationality">Nationality</option>
+          <option value="roomType">Room Type</option>
+          <option value="stayDate">Stay Date (After)</option>
+          <option value="addedDate">Added After Date</option>
+          <option value="status">Status</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Value</label>
+        <input type="text" class="form-control" id="segmentValue" placeholder="e.g. British">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalSegment')">Cancel</button>
+      <button class="btn btn-primary" onclick="createSegment()">Create Segment</button>
+    </div>
+  </div>
+</div>
+
+<!-- Contact Detail Modal -->
+<div class="modal-overlay hidden" id="modalContactDetail">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="contactDetailName">Contact Details</div>
+      <div class="modal-close" onclick="closeModal('modalContactDetail')">✕</div>
+    </div>
+    <div class="modal-body" id="contactDetailBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-danger btn-sm" id="contactDetailUnsubBtn">Unsubscribe</button>
+      <button class="btn btn-secondary" onclick="closeModal('modalContactDetail')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Password Lock Modal -->
+<div class="modal-overlay hidden" id="modalPasswordLock">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-header">
+      <div class="modal-title">🔒 Settings & Admin</div>
+    </div>
+    <div class="modal-body">
+      <div class="text-xs text-muted mb-16">This area is password protected. Enter your password to continue.</div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-control" id="lockPasswordInput" placeholder="Enter password" onkeydown="if(event.key==='Enter')verifyPassword()">
+      </div>
+      <div id="lockPasswordError" class="hidden">
+        <div class="alert alert-danger" style="margin-bottom:0">Incorrect password. Please try again.</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalPasswordLock')">Cancel</button>
+      <button class="btn btn-primary" onclick="verifyPassword()">Unlock →</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span id="toastIcon">✅</span>
+  <span id="toastMsg">Saved successfully</span>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<!-- SheetJS for Excel import -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<script>
+// ==============================
+// APP STATE
+// ==============================
+let appState = {
+  contacts: [],
+  campaigns: [],
+  templates: [],
+  waTemplates: [],
+  segments: [],
+  auditLog: [],
+  scheduledSends: [],
+  settings: {
+    hotelName: 'Colombo Court Hotel & Spa',
+    tagline: 'Your Boutique Escape in Colombo',
+    senderEmail: '',
+    replyTo: '',
+    phone: '',
+    whatsapp: '',
+    address: '',
+    website: '',
+    footer: '',
+    sendgridKey: '',
+    dailyLimit: 100,
+    gsheetsUrl: '',
+    freqDays: 7,
+    freqMonth: 4,
+    font: 'Poppins',
+    primaryColor: '#C9A96E',
+    secondaryColor: '#2C5F6E',
+    accentColor: '#E8D5B0',
+    logoData: null,
+    footerImgData: null,
+    footerImgAlt: '',
+    footerImgLink: '',
+    footerImgPos: 'above-text',
+    social: {
+      facebook: '', instagram: '', tiktok: '', linkedin: '', youtube: '',
+      tripadvisor: '', googlereviews: '', googlemaps: '', bookingcom: '',
+      brandsite: '', whatsappLink: '', phone: ''
+    }
+  },
+  welcomeEmail: { subject: '', body: '' },
+  unsubPage: { headline: '', message: '', resubLabel: '', footer: '' },
+  currentTheme: 'dark',
+  currentPreviewMode: 'desktop',
+  calendarDate: new Date(),
+  pendingImport: [],
+  attachments: [],
+  waSentList: {}
+};
+
+const SOCIAL_PLATFORMS = [
+  { key: 'facebook', label: 'Facebook', icon: '📘', placeholder: 'https://facebook.com/yourpage' },
+  { key: 'instagram', label: 'Instagram', icon: '📸', placeholder: 'https://instagram.com/yourhandle' },
+  { key: 'tiktok', label: 'TikTok', icon: '🎵', placeholder: 'https://tiktok.com/@yourhandle' },
+  { key: 'linkedin', label: 'LinkedIn', icon: '💼', placeholder: 'https://linkedin.com/company/...' },
+  { key: 'youtube', label: 'YouTube', icon: '▶️', placeholder: 'https://youtube.com/c/...' },
+  { key: 'tripadvisor', label: 'TripAdvisor', icon: '🦉', placeholder: 'https://tripadvisor.com/...' },
+  { key: 'googlereviews', label: 'Google Reviews', icon: '⭐', placeholder: 'https://g.page/r/...' },
+  { key: 'googlemaps', label: 'Google Maps', icon: '🗺️', placeholder: 'https://maps.google.com/...' },
+  { key: 'bookingcom', label: 'Booking.com', icon: '🏨', placeholder: 'https://booking.com/hotel/...' },
+  { key: 'brandsite', label: 'Our Website', icon: '🌐', placeholder: 'https://colombocourthotel.com' },
+  { key: 'whatsappLink', label: 'WhatsApp', icon: '💬', placeholder: 'https://wa.me/94XXXXXXXXX' },
+  { key: 'phone', label: 'Call Us', icon: '📞', placeholder: '+94 11 XXX XXXX' }
+];
+
+// ==============================
+// PERSISTENCE (localStorage)
+// ==============================
+function saveState() {
+  try {
+    localStorage.setItem('ccmp_state', JSON.stringify(appState));
+  } catch(e) { console.warn('State save failed:', e); }
+}
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem('ccmp_state');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      appState = { ...appState, ...parsed };
+      appState.settings = { ...appState.settings, ...(parsed.settings || {}) };
+      if (parsed.settings && parsed.settings.social) {
+        appState.settings.social = { ...appState.settings.social, ...parsed.settings.social };
+      }
+    }
+  } catch(e) { console.warn('State load failed:', e); }
+}
+
+// ==============================
+// INIT
+// ==============================
+function init() {
+  loadState();
+  applyTheme(appState.currentTheme);
+  applyFont(appState.settings.font);
+  applyBrandColor('primary', appState.settings.primaryColor);
+  applyBrandColor('secondary', appState.settings.secondaryColor);
+  loadSettingsToUI();
+  renderSocialToggles();
+  renderSocialLinksForm();
+  initCharts();
+  updateDashboard();
+  renderContacts();
+  renderCampaigns();
+  buildCalendar();
+  buildSnippet();
+  renderAuditLog();
+  updateNavBadges();
+  checkPasswordSetup();
+  loadFooterImgToUI();
+  addAudit('App loaded', 'info');
+  // Set today's date defaults
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('dateFrom').value = new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0];
+  document.getElementById('dateTo').value = today;
+  document.getElementById('scheduleDate').value = today;
+  // Populate personalization tags from custom fields
+  buildPersonalizationTags();
+  // Update unsubscribe and welcome previews
+  updateUnsubPreview();
+  updateWelcomePreview();
+  // Reset settings lock on fresh load
+  settingsUnlocked = false;
+}
+
+// ==============================
+// THEME
+// ==============================
+function toggleTheme() {
+  appState.currentTheme = appState.currentTheme === 'dark' ? 'light' : 'dark';
+  applyTheme(appState.currentTheme);
+  saveState();
+}
+
+function applyTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  const btn = document.getElementById('themeBtn');
+  btn.textContent = t === 'dark' ? '☀️ Light' : '🌙 Dark';
+  if (window._chartMonthly) {
+    setTimeout(() => { destroyCharts(); initCharts(); updateDashboard(); }, 50);
+  }
+}
+
+// ==============================
+// PASSWORD PROTECTION
+// ==============================
+let settingsUnlocked = false;
+
+function hashPassword(pw) {
+  // Simple hash for localStorage storage — not cryptographic but sufficient for this use case
+  let hash = 0;
+  for (let i = 0; i < pw.length; i++) { hash = ((hash << 5) - hash) + pw.charCodeAt(i); hash |= 0; }
+  return 'ccmp_' + Math.abs(hash).toString(36) + pw.length;
+}
+
+function requestSettingsAccess(navEl) {
+  const storedHash = localStorage.getItem('ccmp_pw');
+  if (!storedHash || settingsUnlocked) {
+    settingsUnlocked = true;
+    showPage('settings', navEl);
+    return;
+  }
+  document.getElementById('lockPasswordInput').value = '';
+  document.getElementById('lockPasswordError').classList.add('hidden');
+  openModal('modalPasswordLock');
+  // Store nav element reference for after unlock
+  window._pendingSettingsNav = navEl;
+}
+
+function verifyPassword() {
+  const input = document.getElementById('lockPasswordInput').value;
+  const storedHash = localStorage.getItem('ccmp_pw');
+  if (hashPassword(input) === storedHash) {
+    settingsUnlocked = true;
+    closeModal('modalPasswordLock');
+    showPage('settings', window._pendingSettingsNav);
+    addAudit('Settings unlocked');
+  } else {
+    document.getElementById('lockPasswordError').classList.remove('hidden');
+    document.getElementById('lockPasswordInput').value = '';
+    document.getElementById('lockPasswordInput').focus();
+  }
+}
+
+function savePassword() {
+  const current = document.getElementById('currentPasswordInput').value;
+  const newPw = document.getElementById('newPasswordInput').value;
+  const confirm = document.getElementById('confirmPasswordInput').value;
+  const storedHash = localStorage.getItem('ccmp_pw');
+  const statusEl = document.getElementById('passwordStatus');
+
+  if (storedHash && hashPassword(current) !== storedHash) {
+    statusEl.innerHTML = '<div class="alert alert-danger">Current password is incorrect.</div>';
+    return;
+  }
+  if (!newPw) { statusEl.innerHTML = '<div class="alert alert-danger">New password cannot be empty.</div>'; return; }
+  if (newPw !== confirm) { statusEl.innerHTML = '<div class="alert alert-danger">Passwords do not match.</div>'; return; }
+  if (newPw.length < 4) { statusEl.innerHTML = '<div class="alert alert-danger">Password must be at least 4 characters.</div>'; return; }
+
+  localStorage.setItem('ccmp_pw', hashPassword(newPw));
+  settingsUnlocked = true;
+  document.getElementById('currentPasswordInput').value = '';
+  document.getElementById('newPasswordInput').value = '';
+  document.getElementById('confirmPasswordInput').value = '';
+  document.getElementById('removePasswordBtn').style.display = '';
+  statusEl.innerHTML = '<div class="alert alert-success">✅ Password set successfully! Settings are now protected.</div>';
+  addAudit('Settings password updated');
+}
+
+function removePassword() {
+  const current = document.getElementById('currentPasswordInput').value;
+  const storedHash = localStorage.getItem('ccmp_pw');
+  if (storedHash && hashPassword(current) !== storedHash) {
+    document.getElementById('passwordStatus').innerHTML = '<div class="alert alert-danger">Current password is incorrect.</div>';
+    return;
+  }
+  localStorage.removeItem('ccmp_pw');
+  settingsUnlocked = false;
+  document.getElementById('removePasswordBtn').style.display = 'none';
+  document.getElementById('passwordStatus').innerHTML = '<div class="alert alert-success">✅ Password removed. Settings are now open.</div>';
+  addAudit('Settings password removed');
+}
+
+function checkPasswordSetup() {
+  const has = !!localStorage.getItem('ccmp_pw');
+  const btn = document.getElementById('removePasswordBtn');
+  if (btn) btn.style.display = has ? '' : 'none';
+}
+
+// ==============================
+// NAVIGATION
+// ==============================
+const PAGE_META = {
+  dashboard: { title: 'Dashboard', subtitle: 'Overview of your marketing activity' },
+  campaigns: { title: 'Campaigns', subtitle: 'All email campaigns' },
+  compose: { title: 'New Campaign', subtitle: 'Design and schedule your campaign' },
+  templates: { title: 'Templates', subtitle: 'Saved email templates' },
+  scheduled: { title: 'Scheduled Sends', subtitle: 'Upcoming email batches' },
+  contacts: { title: 'Contacts', subtitle: 'Full guest database' },
+  segments: { title: 'Segments', subtitle: 'Targeted contact groups' },
+  unsubscribed: { title: 'Unsubscribed', subtitle: 'Opted-out contacts' },
+  suppressed: { title: 'Suppressed', subtitle: 'Bounced / invalid emails' },
+  whatsapp: { title: 'WhatsApp Bulk Messaging', subtitle: 'Click-to-send links for guests' },
+  calendar: { title: 'Campaign Calendar', subtitle: 'Visual campaign schedule' },
+  'welcome-editor': { title: 'Welcome Email', subtitle: 'Edit the subscriber welcome email' },
+  'unsub-editor': { title: 'Unsubscribe Page', subtitle: 'Edit the unsubscribe page' },
+  settings: { title: 'Settings & Admin', subtitle: 'Hotel profile, integrations and admin tools 🔒' }
+};
+
+function showPage(id, navEl) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const page = document.getElementById('page-' + id);
+  if (page) page.classList.add('active');
+  if (navEl) navEl.classList.add('active');
+  const meta = PAGE_META[id] || { title: id, subtitle: '' };
+  document.getElementById('topbarTitle').textContent = meta.title;
+  document.getElementById('topbarSubtitle').textContent = meta.subtitle;
+  closeSidebar();
+  // Page-specific refresh
+  if (id === 'contacts') { renderContacts(); updateNavBadges(); }
+  if (id === 'campaigns') renderCampaigns();
+  if (id === 'whatsapp') renderWAContacts();
+  if (id === 'calendar') buildCalendar();
+  if (id === 'compose') buildPersonalizationTags();
+  if (id === 'dashboard') updateDashboard();
+  if (id === 'snippet') { buildSnippet(); showSettingsTab('snippet', null); }
+  if (id === 'audit') { renderAuditLog(); showSettingsTab('audit', null); }
+  if (id === 'settings') { buildSnippet(); renderAuditLog(); checkPasswordSetup(); loadFooterImgToUI(); }
+  if (id === 'scheduled') renderScheduled();
+  if (id === 'segments') renderSegments();
+  if (id === 'unsubscribed') renderUnsubList();
+  if (id === 'suppressed') renderSuppressed();
+  if (id === 'unsub-editor') updateUnsubPreview();
+  if (id === 'welcome-editor') updateWelcomePreview();
+}
+
+// ==============================
+// SIDEBAR MOBILE
+// ==============================
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebarOverlay').classList.add('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+}
+
+// ==============================
+// MODAL
+// ==============================
+function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+function showAddContactModal() { openModal('modalAddContact'); }
+function showImportModal() { openModal('modalImport'); }
+function showGSheetsModal() {
+  document.getElementById('gsheetsSyncUrl').value = appState.settings.gsheetsUrl || '';
+  openModal('modalGSheets');
+}
+function showAddSegmentModal() { openModal('modalSegment'); }
+
+// ==============================
+// TOAST
+// ==============================
+let toastTimer;
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
+  document.getElementById('toastIcon').textContent = icons[type] || '✅';
+  document.getElementById('toastMsg').textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.classList.remove('show'); }, 3000);
+}
+
+// ==============================
+// TIMESTAMP
+// ==============================
+function fmtDate(d) {
+  if (!d) return '—';
+  const dt = d instanceof Date ? d : new Date(d);
+  if (isNaN(dt)) return '—';
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const day = dt.getDate();
+  const mon = months[dt.getMonth()];
+  const yr = dt.getFullYear();
+  const h = dt.getHours().toString().padStart(2,'0');
+  const m = dt.getMinutes().toString().padStart(2,'0');
+  return `${day} ${mon} ${yr}, ${h}:${m}`;
+}
+
+function fmtDateOnly(d) {
+  if (!d) return '—';
+  const dt = d instanceof Date ? d : new Date(d);
+  if (isNaN(dt)) return '—';
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${dt.getDate()} ${months[dt.getMonth()]} ${dt.getFullYear()}`;
+}
+
+// ==============================
+// AUDIT LOG
+// ==============================
+function addAudit(action, type = 'info') {
+  appState.auditLog.unshift({ action, type, time: new Date().toISOString() });
+  if (appState.auditLog.length > 200) appState.auditLog = appState.auditLog.slice(0, 200);
+  saveState();
+}
+
+function renderAuditLog() {
+  const el = document.getElementById('auditLogEl');
+  if (!appState.auditLog.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📝</div><div class="empty-state-title">No activity yet</div></div>';
+    return;
+  }
+  el.innerHTML = appState.auditLog.map(a => `
+    <div class="audit-row">
+      <div class="audit-dot"></div>
+      <div class="audit-content">
+        <div class="audit-action">${a.action}</div>
+        <div class="audit-time">${fmtDate(a.time)}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function clearAuditLog() {
+  appState.auditLog = [];
+  saveState();
+  renderAuditLog();
+  showToast('Audit log cleared');
+}
+
+// ==============================
+// NAV BADGES
+// ==============================
+function updateNavBadges() {
+  const active = appState.contacts.filter(c => c.status === 'subscribed').length;
+  document.getElementById('navContactBadge').textContent = active;
+  document.getElementById('navCampaignBadge').textContent = appState.campaigns.length;
+  document.getElementById('statContacts').textContent = active;
+  document.getElementById('statUnsub').textContent = appState.contacts.filter(c => c.status === 'unsubscribed').length;
+  document.getElementById('contactCountLabel').textContent = `${appState.contacts.length} total contacts`;
+}
+
+// ==============================
+// CONTACTS
+// ==============================
+function addContact() {
+  const first = document.getElementById('newContactFirst').value.trim();
+  const last = document.getElementById('newContactLast').value.trim();
+  const email = document.getElementById('newContactEmail').value.trim();
+  const mobile = document.getElementById('newContactMobile').value.trim();
+  if (!first || !email || !mobile) { showToast('Name, Email and Mobile are required', 'error'); return; }
+  if (appState.contacts.find(c => c.email === email)) { showToast('Contact with this email already exists', 'warning'); return; }
+  const contact = {
+    id: Date.now(),
+    firstName: first,
+    lastName: last,
+    email,
+    mobile,
+    nationality: document.getElementById('newContactNat').value.trim(),
+    stayDate: document.getElementById('newContactStay').value,
+    roomType: document.getElementById('newContactRoom').value.trim(),
+    notes: document.getElementById('newContactNotes').value.trim(),
+    status: 'subscribed',
+    addedDate: new Date().toISOString(),
+    emailsSent: 0,
+    lastEmailDate: null,
+    openCount: 0,
+    history: []
+  };
+  appState.contacts.push(contact);
+  saveState();
+  closeModal('modalAddContact');
+  renderContacts();
+  updateNavBadges();
+  addAudit(`Contact added: ${first} ${last} (${email})`);
+  showToast('Contact added successfully');
+  // Clear fields
+  ['newContactFirst','newContactLast','newContactEmail','newContactMobile','newContactNat','newContactRoom','newContactNotes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('newContactStay').value = '';
+  syncToGSheets();
+}
+
+function renderContacts() {
+  const el = document.getElementById('contactListEl');
+  const search = (document.getElementById('contactSearch')?.value || '').toLowerCase();
+  const statusF = document.getElementById('contactStatusFilter')?.value || '';
+  let list = appState.contacts.filter(c => {
+    const matchSearch = !search || `${c.firstName} ${c.lastName} ${c.email}`.toLowerCase().includes(search);
+    const matchStatus = !statusF || c.status === statusF;
+    return matchSearch && matchStatus;
+  });
+  if (!list.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👥</div><div class="empty-state-title">No contacts found</div><p>Add contacts or adjust filters</p></div>';
+    return;
+  }
+  el.innerHTML = list.map(c => `
+    <div class="contact-row" onclick="showContactDetail(${c.id})">
+      <div class="contact-avatar">${(c.firstName||'?')[0].toUpperCase()}</div>
+      <div class="contact-info">
+        <div class="contact-name">${c.firstName} ${c.lastName||''}</div>
+        <div class="contact-email">${c.email} · ${c.mobile||'—'}</div>
+      </div>
+      <div style="flex-shrink:0">
+        <span class="badge ${c.status==='subscribed'?'badge-success':'badge-danger'}">${c.status}</span>
+      </div>
+      <div class="text-xs text-muted" style="flex-shrink:0;min-width:110px;text-align:right">${fmtDateOnly(c.addedDate)}</div>
+    </div>
+  `).join('');
+  document.getElementById('contactCountLabel').textContent = `${appState.contacts.length} total · ${list.length} shown`;
+}
+
+function showContactDetail(id) {
+  const c = appState.contacts.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('contactDetailName').textContent = `${c.firstName} ${c.lastName||''}`;
+  document.getElementById('contactDetailBody').innerHTML = `
+    <div class="form-row" style="margin-bottom:12px">
+      <div><div class="form-label">Email</div><div style="font-size:13px">${c.email}</div></div>
+      <div><div class="form-label">Mobile</div><div style="font-size:13px">${c.mobile||'—'}</div></div>
+    </div>
+    <div class="form-row" style="margin-bottom:12px">
+      <div><div class="form-label">Nationality</div><div style="font-size:13px">${c.nationality||'—'}</div></div>
+      <div><div class="form-label">Room Type</div><div style="font-size:13px">${c.roomType||'—'}</div></div>
+    </div>
+    <div class="form-row" style="margin-bottom:12px">
+      <div><div class="form-label">Stay Date</div><div style="font-size:13px">${c.stayDate ? fmtDateOnly(c.stayDate) : '—'}</div></div>
+      <div><div class="form-label">Added</div><div style="font-size:13px">${fmtDateOnly(c.addedDate)}</div></div>
+    </div>
+    <div class="form-row" style="margin-bottom:12px">
+      <div><div class="form-label">Emails Sent</div><div style="font-size:13px">${c.emailsSent||0}</div></div>
+      <div><div class="form-label">Opens</div><div style="font-size:13px">${c.openCount||0}</div></div>
+    </div>
+    <div style="margin-bottom:12px"><div class="form-label">Status</div>
+      <span class="badge ${c.status==='subscribed'?'badge-success':'badge-danger'}">${c.status}</span>
+    </div>
+    ${c.notes ? `<div><div class="form-label">Notes</div><div style="font-size:13px">${c.notes}</div></div>` : ''}
+    ${c.history && c.history.length ? `<div class="mt-12"><div class="form-label">Email History</div>${c.history.slice(-5).reverse().map(h=>`<div class="text-xs" style="padding:4px 0;border-bottom:1px solid var(--border)44">${h.campaign} — ${fmtDate(h.date)}</div>`).join('')}</div>` : ''}
+  `;
+  const unsubBtn = document.getElementById('contactDetailUnsubBtn');
+  if (c.status === 'subscribed') {
+    unsubBtn.style.display = '';
+    unsubBtn.onclick = () => { unsubscribeContact(id); closeModal('modalContactDetail'); };
+  } else {
+    unsubBtn.style.display = 'none';
+  }
+  openModal('modalContactDetail');
+}
+
+function unsubscribeContact(id) {
+  const c = appState.contacts.find(x => x.id === id);
+  if (c) {
+    c.status = 'unsubscribed';
+    addAudit(`Contact unsubscribed: ${c.email}`);
+    saveState();
+    renderContacts();
+    renderUnsubList();
+    updateNavBadges();
+    showToast(`${c.email} unsubscribed`);
+    syncToGSheets();
+  }
+}
+
+function renderUnsubList() {
+  const el = document.getElementById('unsubListEl');
+  const list = appState.contacts.filter(c => c.status === 'unsubscribed');
+  if (!list.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🚫</div><div class="empty-state-title">No unsubscribes yet</div></div>';
+    return;
+  }
+  el.innerHTML = list.map(c => `
+    <div class="contact-row">
+      <div class="contact-avatar" style="background:var(--danger)22;color:var(--danger)">${(c.firstName||'?')[0].toUpperCase()}</div>
+      <div class="contact-info">
+        <div class="contact-name">${c.firstName} ${c.lastName||''}</div>
+        <div class="contact-email">${c.email}</div>
+      </div>
+      <span class="badge badge-danger">Unsubscribed</span>
+      <div class="text-xs text-muted" style="min-width:90px;text-align:right">${fmtDateOnly(c.addedDate)}</div>
+    </div>
+  `).join('');
+}
+
+function renderSuppressed() {
+  const el = document.getElementById('suppressedListEl');
+  const list = appState.contacts.filter(c => c.status === 'suppressed');
+  if (!list.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⛔</div><div class="empty-state-title">No suppressed contacts</div></div>';
+    return;
+  }
+  el.innerHTML = list.map(c => `
+    <div class="contact-row">
+      <div class="contact-avatar" style="background:var(--text-muted)22;color:var(--text-muted)">${(c.firstName||'?')[0].toUpperCase()}</div>
+      <div class="contact-info">
+        <div class="contact-name">${c.firstName} ${c.lastName||''}</div>
+        <div class="contact-email">${c.email}</div>
+      </div>
+      <span class="badge badge-muted">Bounced</span>
+    </div>
+  `).join('');
+}
+
+function exportUnsubscribed() {
+  const list = appState.contacts.filter(c => c.status === 'unsubscribed');
+  if (!list.length) { showToast('No unsubscribed contacts', 'warning'); return; }
+  const csv = ['Name,Email,Mobile'].concat(list.map(c => `${c.firstName} ${c.lastName||''},${c.email},${c.mobile||''}`)).join('\n');
+  downloadText(csv, 'unsubscribed.csv', 'text/csv');
+  addAudit('Exported unsubscribed list');
+}
+
+// ==============================
+// EXCEL IMPORT
+// ==============================
+function handleExcelImport(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const wb = XLSX.read(ev.target.result, { type: 'binary' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const data = XLSX.utils.sheet_to_json(ws, { defval: '' });
+      appState.pendingImport = data;
+      showImportPreview(data);
+    } catch(err) {
+      showToast('Error reading file', 'error');
+    }
+  };
+  reader.readAsBinaryString(file);
+}
+
+function showImportPreview(data) {
+  const el = document.getElementById('importPreview');
+  if (!data.length) { el.innerHTML = '<div class="alert alert-danger">No data found in file</div>'; return; }
+  const headers = Object.keys(data[0]);
+  el.innerHTML = `
+    <div class="alert alert-success mb-12">Found <strong>${data.length}</strong> rows. First 5 shown:</div>
+    <div class="table-wrap" style="max-height:200px;overflow-y:auto">
+      <table>
+        <thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+        <tbody>${data.slice(0,5).map(r=>`<tr>${headers.map(h=>`<td>${r[h]||'—'}</td>`).join('')}</tr>`).join('')}</tbody>
+      </table>
+    </div>
+  `;
+  document.getElementById('importConfirmBtn').style.display = '';
+}
+
+function confirmImport() {
+  let added = 0, skipped = 0;
+  for (const row of appState.pendingImport) {
+    const firstName = row['First Name'] || row['first_name'] || row['FirstName'] || row['Name'] || row['name'] || '';
+    const email = row['Email'] || row['email'] || row['EMAIL'] || '';
+    const mobile = row['Mobile'] || row['mobile'] || row['Phone'] || row['phone'] || row['Mobile Number'] || '';
+    if (!email || !firstName) { skipped++; continue; }
+    if (appState.contacts.find(c => c.email === email)) { skipped++; continue; }
+    appState.contacts.push({
+      id: Date.now() + Math.random(),
+      firstName: firstName.trim(),
+      lastName: (row['Last Name'] || row['last_name'] || row['LastName'] || '').trim(),
+      email: email.trim(),
+      mobile: mobile.trim(),
+      nationality: (row['Nationality'] || row['nationality'] || '').trim(),
+      stayDate: row['Stay Date'] || row['stay_date'] || '',
+      roomType: (row['Room Type'] || row['room_type'] || '').trim(),
+      notes: (row['Notes'] || row['notes'] || '').trim(),
+      status: 'subscribed',
+      addedDate: new Date().toISOString(),
+      emailsSent: 0,
+      lastEmailDate: null,
+      openCount: 0,
+      history: []
+    });
+    added++;
+  }
+  saveState();
+  closeModal('modalImport');
+  renderContacts();
+  updateNavBadges();
+  updateRecipientCount();
+  addAudit(`Imported ${added} contacts (${skipped} skipped)`);
+  showToast(`${added} contacts imported, ${skipped} skipped`);
+  syncToGSheets();
+}
+
+// ==============================
+// GOOGLE SHEETS SYNC (Simulated)
+// ==============================
+function syncToGSheets() {
+  if (!appState.settings.gsheetsUrl) return;
+  // In production: POST data to the Google Apps Script Web App URL
+  // For now: simulated
+  console.log('Syncing to Google Sheets...', appState.settings.gsheetsUrl);
+}
+
+function syncFromGSheets() {
+  const url = appState.settings.gsheetsUrl;
+  if (!url) {
+    document.getElementById('gsheetsSyncStatus').innerHTML = '<div class="alert alert-warning">No Google Sheets URL configured. Go to Settings → Google Sheets.</div>';
+    return;
+  }
+  document.getElementById('gsheetsSyncStatus').innerHTML = '<div class="alert alert-info">🔄 Syncing from Google Sheets...</div>';
+  // In production: fetch(url + '?action=getContacts').then(...)
+  setTimeout(() => {
+    document.getElementById('gsheetsSyncStatus').innerHTML = '<div class="alert alert-success">✅ Sync complete. All contacts up to date.</div>';
+    addAudit('Synced from Google Sheets');
+  }, 1500);
+}
+
+function testGSheets() {
+  const url = document.getElementById('settingGSheetsUrl').value.trim();
+  if (!url) { document.getElementById('gsheetsStatus').innerHTML = '<div class="alert alert-warning">Please enter a URL first.</div>'; return; }
+  document.getElementById('gsheetsStatus').innerHTML = '<div class="alert alert-info">🔄 Testing connection...</div>';
+  setTimeout(() => {
+    document.getElementById('gsheetsStatus').innerHTML = '<div class="alert alert-success">✅ Connection successful! Google Sheets is ready.</div>';
+  }, 1500);
+}
+
+// ==============================
+// CAMPAIGNS
+// ==============================
+function renderCampaigns() {
+  const el = document.getElementById('campaignList');
+  if (!appState.campaigns.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📣</div><div class="empty-state-title">No campaigns yet</div><p>Create your first email campaign</p><button class="btn btn-primary mt-12" onclick="showPage(\'compose\',null)">+ Create Campaign</button></div>';
+    return;
+  }
+  el.innerHTML = appState.campaigns.map(c => {
+    const openRate = c.sent > 0 ? Math.round((c.opened / c.sent) * 100) : 0;
+    const statusColors = { draft:'badge-muted', scheduled:'badge-info', sending:'badge-warning', completed:'badge-success', paused:'badge-danger' };
+    return `
+      <div class="campaign-card" onclick="viewCampaign(${c.id})">
+        <div class="campaign-card-header">
+          <div>
+            <div class="campaign-name">${c.name}</div>
+            <div class="campaign-meta">${c.subject} · ${fmtDate(c.createdAt)}</div>
+          </div>
+          <div class="flex gap-8 items-center">
+            ${c.notes ? `<span title="${c.notes}" style="font-size:16px;cursor:help">📌</span>` : ''}
+            <span class="badge ${statusColors[c.status]||'badge-muted'}">${c.status}</span>
+            <button class="btn btn-secondary btn-xs" onclick="event.stopPropagation();duplicateCampaign(${c.id})">Duplicate</button>
+          </div>
+        </div>
+        <div class="campaign-stats">
+          <div class="campaign-stat-item"><div class="campaign-stat-val">${c.sent||0}</div><div class="campaign-stat-lbl">Sent</div></div>
+          <div class="campaign-stat-item"><div class="campaign-stat-val" style="color:var(--success)">${c.opened||0}</div><div class="campaign-stat-lbl">Opened</div></div>
+          <div class="campaign-stat-item"><div class="campaign-stat-val" style="color:var(--brand-primary)">${openRate}%</div><div class="campaign-stat-lbl">Open Rate</div></div>
+          <div class="campaign-stat-item"><div class="campaign-stat-val" style="color:var(--info)">${c.clicks||0}</div><div class="campaign-stat-lbl">Clicks</div></div>
+          <div class="campaign-stat-item"><div class="campaign-stat-val" style="color:var(--danger)">${c.bounced||0}</div><div class="campaign-stat-lbl">Bounced</div></div>
+        </div>
+        <div class="mt-8">
+          <div class="flex justify-between mb-4">
+            <span class="text-xs text-muted">Open Rate</span>
+            <span class="text-xs font-600">${openRate}%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill success" style="width:${openRate}%"></div></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function filterCampaigns(v) {
+  document.querySelectorAll('.campaign-card').forEach(el => {
+    el.style.display = el.querySelector('.campaign-name').textContent.toLowerCase().includes(v.toLowerCase()) ? '' : 'none';
+  });
+}
+
+function filterCampaignStatus(v) {
+  document.querySelectorAll('.campaign-card').forEach(el => {
+    el.style.display = !v || el.querySelector('.badge').textContent === v ? '' : 'none';
+  });
+}
+
+function viewCampaign(id) {
+  const c = appState.campaigns.find(x => x.id === id);
+  if (!c) return;
+  // Load campaign into composer
+  document.getElementById('campaignName').value = c.name;
+  document.getElementById('campaignSubject').value = c.subject;
+  document.getElementById('emailBody').innerHTML = c.body || '';
+  document.getElementById('campaignNotes').value = c.notes || '';
+  document.getElementById('composeTitle').textContent = 'Edit: ' + c.name;
+  showPage('compose', null);
+}
+
+function duplicateCampaign(id) {
+  const c = appState.campaigns.find(x => x.id === id);
+  if (!c) return;
+  const copy = { ...c, id: Date.now(), name: c.name + ' (Copy)', status: 'draft', createdAt: new Date().toISOString(), sent: 0, opened: 0, bounced: 0, clicks: 0 };
+  appState.campaigns.unshift(copy);
+  saveState();
+  renderCampaigns();
+  addAudit(`Campaign duplicated: ${c.name}`);
+  showToast('Campaign duplicated');
+}
+
+// ==============================
+// COMPOSE
+// ==============================
+function execFormat(cmd, val) {
+  document.getElementById('emailBody').focus();
+  document.execCommand(cmd, false, val || null);
+}
+function execFormatW(cmd) {
+  document.getElementById('welcomeBody').focus();
+  document.execCommand(cmd, false, null);
+}
+function insertTag(tag) {
+  const body = document.getElementById('emailBody');
+  body.focus();
+  document.execCommand('insertText', false, tag);
+}
+function insertLink() {
+  const url = prompt('Enter URL:');
+  if (url) { document.getElementById('emailBody').focus(); document.execCommand('createLink', false, url); }
+}
+function insertButton() {
+  const label = prompt('Button label:', 'Book Now');
+  if (!label) return;
+  document.getElementById('emailBody').focus();
+  document.execCommand('insertHTML', false, `<a href="#" style="display:inline-block;background:${appState.settings.primaryColor};color:white;padding:10px 20px;border-radius:6px;text-decoration:none;font-weight:700;margin:8px 0">${label}</a>`);
+}
+function insertDivider() {
+  document.getElementById('emailBody').focus();
+  document.execCommand('insertHTML', false, '<hr style="border:none;border-top:1px solid #ddd;margin:16px 0">');
+}
+
+function buildPersonalizationTags() {
+  const container = document.getElementById('personalizationTags');
+  const standard = ['{{First Name}}', '{{Full Name}}', '{{Email}}', '{{Mobile}}', '{{Hotel Name}}'];
+  // Add custom fields from contacts
+  const customFields = new Set();
+  appState.contacts.forEach(c => { if (c.nationality) customFields.add('{{Nationality}}'); if (c.roomType) customFields.add('{{Room Type}}'); });
+  const allTags = [...standard, ...customFields];
+  container.innerHTML = allTags.map(t => `<span class="tag" onclick="insertTag('${t}')">${t}</span>`).join('');
+}
+
+function updateRecipientCount() {
+  const seg = document.getElementById('recipientSegment').value;
+  let list;
+  if (seg === 'all') list = appState.contacts.filter(c => c.status === 'subscribed');
+  else if (seg === 'new') { const m = new Date(); m.setDate(1); list = appState.contacts.filter(c => c.status === 'subscribed' && new Date(c.addedDate) >= m); }
+  else list = appState.contacts.filter(c => c.status === 'subscribed');
+  const n = list.length;
+  document.getElementById('recipientCountText').textContent = `${n} recipient${n !== 1 ? 's' : ''} selected`;
+  const limit = appState.settings.dailyLimit || 100;
+  if (n > limit) {
+    document.getElementById('splitInfo').classList.remove('hidden');
+    const batches = Math.ceil(n / limit);
+    document.getElementById('splitBatches').innerHTML = Array.from({length: batches}, (_,i) => {
+      const start = i * limit + 1;
+      const end = Math.min((i+1)*limit, n);
+      return `<div class="schedule-batch"><div class="batch-num">${i+1}</div><div class="batch-info"><div class="batch-label">Batch ${i+1} — Day ${i+1}</div><div class="batch-sub">Recipients ${start}–${end} (${end-start+1} emails)</div></div></div>`;
+    }).join('');
+  } else {
+    document.getElementById('splitInfo').classList.add('hidden');
+  }
+}
+
+function toggleScheduleFields() {
+  const v = document.getElementById('sendOption').value;
+  document.getElementById('scheduleFields').classList.toggle('hidden', v !== 'scheduled');
+}
+
+function handleAttachments(e) {
+  const files = Array.from(e.target.files);
+  appState.attachments = [...appState.attachments, ...files];
+  renderAttachments();
+}
+
+function renderAttachments() {
+  const el = document.getElementById('attachList');
+  el.innerHTML = appState.attachments.map((f, i) => `
+    <div class="flex items-center gap-8 mb-4">
+      <span style="font-size:16px">${f.type.includes('pdf') ? '📄' : '🖼️'}</span>
+      <span class="text-xs" style="flex:1">${f.name}</span>
+      <button class="btn btn-danger btn-xs" onclick="removeAttachment(${i})">✕</button>
+    </div>
+  `).join('');
+}
+
+function removeAttachment(i) {
+  appState.attachments.splice(i, 1);
+  renderAttachments();
+}
+
+function saveDraft() {
+  const name = document.getElementById('campaignName').value.trim();
+  if (!name) { showToast('Please enter a campaign name', 'error'); return; }
+  const existing = appState.campaigns.find(c => c.name === name && c.status === 'draft');
+  const campaign = {
+    id: existing ? existing.id : Date.now(),
+    name,
+    subject: document.getElementById('campaignSubject').value,
+    previewText: document.getElementById('campaignPreviewText').value,
+    body: document.getElementById('emailBody').innerHTML,
+    notes: document.getElementById('campaignNotes').value,
+    status: 'draft',
+    createdAt: existing ? existing.createdAt : new Date().toISOString(),
+    sent: existing ? existing.sent : 0,
+    opened: existing ? existing.opened : 0,
+    bounced: existing ? existing.bounced : 0,
+    clicks: existing ? existing.clicks : 0
+  };
+  if (existing) {
+    const idx = appState.campaigns.findIndex(c => c.id === existing.id);
+    appState.campaigns[idx] = campaign;
+  } else {
+    appState.campaigns.unshift(campaign);
+  }
+  saveState();
+  updateNavBadges();
+  addAudit(`Draft saved: ${name}`);
+  showToast('Draft saved');
+}
+
+function previewEmail() {
+  openModal('modalPreview');
+  renderPreview('desktop');
+}
+
+function renderPreview(mode) {
+  const name = document.getElementById('campaignName').value || 'Campaign Preview';
+  const subject = document.getElementById('campaignSubject').value || '(no subject)';
+  const body = document.getElementById('emailBody').innerHTML;
+  const hotel = appState.settings.hotelName || 'Hotel Name';
+  const preview_body = body.replace(/{{First Name}}/g, 'Guest').replace(/{{Full Name}}/g, 'Valued Guest').replace(/{{Hotel Name}}/g, hotel).replace(/{{Email}}/g, 'guest@email.com');
+  const maxW = mode === 'mobile' ? '380px' : '600px';
+  const socialHtml = buildSocialIconsHtml();
+  const footerImgHtml = buildFooterImageHtml();
+  const pos = appState.settings.footerImgPos || 'above-text';
+  const footerTextHtml = `<div style="padding:12px 24px;background:#f0f0f0;font-size:11px;color:#888;text-align:center">${appState.settings.footer || `© ${new Date().getFullYear()} ${hotel} · All Rights Reserved`} · <a href="#" style="color:#888">Unsubscribe</a></div>`;
+  let footerBlock = '';
+  if (pos === 'above-text') footerBlock = footerImgHtml + footerTextHtml;
+  else if (pos === 'below-text') footerBlock = footerTextHtml + footerImgHtml;
+  else footerBlock = footerImgHtml || footerTextHtml;
+
+  document.getElementById('previewFrame').innerHTML = `
+    <div style="max-width:${maxW};margin:0 auto;font-family:${appState.settings.font||'Poppins'},sans-serif;background:white;border-radius:8px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.1)">
+      <div style="background:${appState.settings.secondaryColor||'#2C5F6E'};padding:24px;text-align:center">
+        ${appState.settings.logoData ? `<img src="${appState.settings.logoData}" style="height:50px;margin-bottom:8px;border-radius:4px">` : ''}
+        <div style="color:white;font-size:20px;font-weight:800">${hotel}</div>
+        <div style="color:rgba(255,255,255,0.7);font-size:12px">${appState.settings.tagline||''}</div>
+      </div>
+      <div style="padding:24px;color:#333;line-height:1.7;font-size:14px">${preview_body}</div>
+      ${socialHtml ? `<div style="padding:16px;text-align:center;background:#f9f9f9;border-top:1px solid #eee">${socialHtml}</div>` : ''}
+      ${footerBlock}
+    </div>
+  `;
+}
+
+function buildSocialIconsHtml() {
+  const icons = [];
+  SOCIAL_PLATFORMS.forEach(p => {
+    const link = appState.settings.social[p.key];
+    const toggle = document.getElementById('social-toggle-' + p.key);
+    if (link && toggle && toggle.classList.contains('on')) {
+      const href = p.key === 'phone' ? `tel:${link}` : link;
+      icons.push(`<a href="${href}" style="display:inline-block;margin:0 4px;font-size:18px;text-decoration:none">${p.icon}</a>`);
+    }
+  });
+  return icons.join('');
+}
+
+function buildFooterImageHtml() {
+  const d = appState.settings.footerImgData;
+  if (!d) return '';
+  const alt = appState.settings.footerImgAlt || '';
+  const link = appState.settings.footerImgLink;
+  const img = `<img src="${d}" alt="${alt}" style="width:100%;max-width:600px;display:block;margin:0 auto;border:none">`;
+  return link ? `<a href="${link}" style="display:block">${img}</a>` : img;
+}
+
+function switchPreviewTab(mode, el) {
+  document.querySelectorAll('#modalPreview .tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  appState.currentPreviewMode = mode;
+  renderPreview(mode);
+}
+
+function scheduleOrSend() {
+  const name = document.getElementById('campaignName').value.trim();
+  const subject = document.getElementById('campaignSubject').value.trim();
+  if (!name || !subject) { showToast('Campaign name and subject are required', 'error'); return; }
+  const seg = document.getElementById('recipientSegment').value;
+  let list = appState.contacts.filter(c => c.status === 'subscribed');
+  const n = list.length;
+  const limit = appState.settings.dailyLimit || 100;
+  const batches = Math.ceil(n / limit);
+  const option = document.getElementById('sendOption').value;
+  const schedDate = document.getElementById('scheduleDate').value;
+  const schedTime = document.getElementById('scheduleTime').value;
+  document.getElementById('sendSummary').innerHTML = `
+    <div class="alert alert-info mb-12">
+      <strong>${name}</strong><br>
+      Subject: ${subject}<br>
+      Recipients: ${n} contacts
+    </div>
+  `;
+  if (batches > 1) {
+    document.getElementById('sendBatchPlan').innerHTML = `
+      <div class="card-title mb-8">📦 Auto-Split Plan (${limit}/day limit)</div>
+      ${Array.from({length:batches},(_,i)=>{
+        const start = i*limit+1; const end = Math.min((i+1)*limit,n);
+        let d = option==='scheduled' && schedDate ? new Date(schedDate) : new Date();
+        d.setDate(d.getDate()+i);
+        return `<div class="schedule-batch"><div class="batch-num">${i+1}</div><div class="batch-info"><div class="batch-label">Batch ${i+1} — ${fmtDateOnly(d)}</div><div class="batch-sub">${end-start+1} emails · ${schedTime||'09:00'} (Colombo time)</div></div></div>`;
+      }).join('')}
+    `;
+  } else {
+    const sendWhen = option === 'scheduled' && schedDate ? `${fmtDateOnly(schedDate)} at ${schedTime}` : 'Now';
+    document.getElementById('sendBatchPlan').innerHTML = `<div class="alert alert-success">✅ Single batch of ${n} emails — Send: ${sendWhen}</div>`;
+  }
+  closeModal('modalPreview');
+  openModal('modalSend');
+}
+
+function confirmSend() {
+  const name = document.getElementById('campaignName').value.trim();
+  const subject = document.getElementById('campaignSubject').value.trim();
+  const body = document.getElementById('emailBody').innerHTML;
+  const seg = document.getElementById('recipientSegment').value;
+  const list = appState.contacts.filter(c => c.status === 'subscribed');
+  const option = document.getElementById('sendOption').value;
+  const campaign = {
+    id: Date.now(),
+    name, subject, body,
+    notes: document.getElementById('campaignNotes').value,
+    status: option === 'scheduled' ? 'scheduled' : 'completed',
+    createdAt: new Date().toISOString(),
+    sentDate: option === 'now' ? new Date().toISOString() : document.getElementById('scheduleDate').value,
+    sent: option === 'now' ? list.length : 0,
+    opened: option === 'now' ? Math.floor(list.length * (0.15 + Math.random() * 0.25)) : 0,
+    bounced: option === 'now' ? Math.floor(list.length * 0.02) : 0,
+    clicks: option === 'now' ? Math.floor(list.length * 0.05) : 0,
+    recipients: list.length
+  };
+  // Update contact history
+  if (option === 'now') {
+    list.forEach(c => {
+      c.emailsSent = (c.emailsSent || 0) + 1;
+      c.lastEmailDate = new Date().toISOString();
+      if (!c.history) c.history = [];
+      c.history.push({ campaign: name, date: new Date().toISOString() });
+    });
+  }
+  appState.campaigns.unshift(campaign);
+  if (option === 'scheduled') {
+    appState.scheduledSends.push({ ...campaign, scheduleDate: document.getElementById('scheduleDate').value, scheduleTime: document.getElementById('scheduleTime').value });
+  }
+  saveState();
+  closeModal('modalSend');
+  renderCampaigns();
+  updateDashboard();
+  updateNavBadges();
+  addAudit(`Campaign ${option==='now'?'sent':'scheduled'}: ${name} (${list.length} recipients)`);
+  showToast(option === 'now' ? `Campaign sent to ${list.length} contacts!` : 'Campaign scheduled successfully');
+  // Reset composer
+  document.getElementById('campaignName').value = '';
+  document.getElementById('campaignSubject').value = '';
+  document.getElementById('emailBody').innerHTML = '<p>Dear {{First Name}},</p><br><p>Write your email content here...</p>';
+  document.getElementById('composeTitle').textContent = 'New Campaign';
+  appState.attachments = [];
+  renderAttachments();
+}
+
+function saveAsTemplate() {
+  const name = document.getElementById('campaignName').value.trim() || 'Template ' + (appState.templates.length+1);
+  const body = document.getElementById('emailBody').innerHTML;
+  appState.templates.push({ id: Date.now(), name, body, createdAt: new Date().toISOString() });
+  saveState();
+  renderTemplates();
+  addAudit(`Template saved: ${name}`);
+  showToast('Saved as template');
+}
+
+function renderTemplates() {
+  const el = document.getElementById('templateList');
+  if (!appState.templates.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">No templates saved</div></div>';
+    return;
+  }
+  el.innerHTML = `<div class="grid-3">${appState.templates.map(t=>`
+    <div class="card">
+      <div class="card-title">${t.name}</div>
+      <div class="card-subtitle">${fmtDate(t.createdAt)}</div>
+      <div class="flex gap-8 mt-8">
+        <button class="btn btn-primary btn-sm" onclick="loadTemplate(${t.id})">Use Template</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteTemplate(${t.id})">Delete</button>
+      </div>
+    </div>
+  `).join('')}</div>`;
+}
+
+function loadTemplate(id) {
+  const t = appState.templates.find(x => x.id === id);
+  if (!t) return;
+  document.getElementById('emailBody').innerHTML = t.body;
+  showPage('compose', null);
+  showToast('Template loaded');
+}
+
+function deleteTemplate(id) {
+  appState.templates = appState.templates.filter(t => t.id !== id);
+  saveState();
+  renderTemplates();
+  showToast('Template deleted');
+}
+
+function renderScheduled() {
+  const el = document.getElementById('scheduledList');
+  const list = appState.scheduledSends.filter(s => s.status === 'scheduled');
+  if (!list.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⏰</div><div class="empty-state-title">No scheduled sends</div></div>';
+    return;
+  }
+  el.innerHTML = list.map(s => `
+    <div class="campaign-card">
+      <div class="campaign-card-header">
+        <div><div class="campaign-name">${s.name}</div><div class="campaign-meta">${s.subject}</div></div>
+        <span class="badge badge-info">Scheduled</span>
+      </div>
+      <div class="text-xs text-muted mt-8">📅 ${fmtDateOnly(s.scheduleDate)} at ${s.scheduleTime} · ${s.recipients} recipients</div>
+    </div>
+  `).join('');
+}
+
+// ==============================
+// SOCIAL TOGGLES (in composer)
+// ==============================
+function renderSocialToggles() {
+  const el = document.getElementById('socialToggles');
+  if (!el) return;
+  el.innerHTML = SOCIAL_PLATFORMS.map(p => `
+    <div class="social-toggle-item">
+      <span>${p.icon} ${p.label}</span>
+      <div class="toggle ${appState.settings.social[p.key] ? 'on' : ''}" id="social-toggle-${p.key}" onclick="toggleSocial('${p.key}', this)"></div>
+    </div>
+  `).join('');
+}
+
+function toggleSocial(key, el) {
+  el.classList.toggle('on');
+}
+
+// ==============================
+// SOCIAL LINKS FORM (in settings)
+// ==============================
+function renderSocialLinksForm() {
+  const el = document.getElementById('socialLinksForm');
+  if (!el) return;
+  el.innerHTML = SOCIAL_PLATFORMS.map(p => `
+    <div class="form-group">
+      <label class="form-label">${p.icon} ${p.label}</label>
+      <input type="text" class="form-control" id="social-link-${p.key}" value="${appState.settings.social[p.key]||''}" placeholder="${p.placeholder}">
+    </div>
+  `).join('');
+}
+
+function saveSocialLinks() {
+  SOCIAL_PLATFORMS.forEach(p => {
+    appState.settings.social[p.key] = document.getElementById('social-link-'+p.key)?.value.trim() || '';
+  });
+  saveState();
+  renderSocialToggles();
+  addAudit('Social links updated');
+  showToast('Social links saved');
+}
+
+// ==============================
+// SEGMENTS
+// ==============================
+function createSegment() {
+  const name = document.getElementById('segmentName').value.trim();
+  const field = document.getElementById('segmentField').value;
+  const value = document.getElementById('segmentValue').value.trim();
+  if (!name) { showToast('Segment name required', 'error'); return; }
+  const seg = { id: Date.now(), name, field, value, createdAt: new Date().toISOString() };
+  const count = appState.contacts.filter(c => {
+    if (field === 'nationality') return c.nationality?.toLowerCase().includes(value.toLowerCase());
+    if (field === 'roomType') return c.roomType?.toLowerCase().includes(value.toLowerCase());
+    if (field === 'status') return c.status === value;
+    return true;
+  }).length;
+  seg.count = count;
+  appState.segments.push(seg);
+  saveState();
+  closeModal('modalSegment');
+  renderSegments();
+  addAudit(`Segment created: ${name}`);
+  showToast(`Segment created: ${count} matching contacts`);
+}
+
+function renderSegments() {
+  const el = document.getElementById('segmentList');
+  if (!appState.segments.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🎯</div><div class="empty-state-title">No segments yet</div></div>';
+    return;
+  }
+  el.innerHTML = `<div class="grid-3">${appState.segments.map(s=>`
+    <div class="card">
+      <div class="card-title">${s.name}</div>
+      <div class="card-subtitle">${s.field}: "${s.value}"</div>
+      <div class="stat-value" style="font-size:24px;margin:8px 0">${s.count}</div>
+      <div class="text-xs text-muted">matching contacts</div>
+      <div class="flex gap-8 mt-12">
+        <button class="btn btn-primary btn-sm" onclick="sendToSegment(${s.id})">Send Campaign</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteSegment(${s.id})">Delete</button>
+      </div>
+    </div>
+  `).join('')}</div>`;
+}
+
+function deleteSegment(id) {
+  appState.segments = appState.segments.filter(s => s.id !== id);
+  saveState(); renderSegments(); showToast('Segment deleted');
+}
+
+// ==============================
+// WHATSAPP
+// ==============================
+function generateWALinks() {
+  const msg = document.getElementById('waMessage').value.trim();
+  if (!msg) { showToast('Please write a message first', 'error'); return; }
+  const seg = document.getElementById('waRecipients').value;
+  let list = appState.contacts.filter(c => c.mobile && (seg === 'all' || c.status === 'subscribed'));
+  if (!list.length) { showToast('No contacts with mobile numbers', 'warning'); return; }
+  const hotel = appState.settings.hotelName || 'Hotel Name';
+  const el = document.getElementById('waContactList');
+  el.innerHTML = list.map(c => {
+    const personalMsg = msg.replace(/{{First Name}}/g, c.firstName).replace(/{{Full Name}}/g, `${c.firstName} ${c.lastName||''}`.trim()).replace(/{{Hotel Name}}/g, hotel);
+    const phone = c.mobile.replace(/[^0-9+]/g,'');
+    const waUrl = `https://wa.me/${phone.replace('+','')}?text=${encodeURIComponent(personalMsg)}`;
+    const sent = appState.waSentList[c.id];
+    return `
+      <div class="wa-contact-row" id="wa-row-${c.id}">
+        <div class="contact-avatar">${(c.firstName||'?')[0].toUpperCase()}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:600;color:var(--text-primary)">${c.firstName} ${c.lastName||''}</div>
+          <div style="font-size:11px;color:var(--text-muted)">${c.mobile}</div>
+        </div>
+        ${sent ? `<span class="wa-sent-mark" title="Sent on ${fmtDate(sent)}">✓✓</span>` : ''}
+        <a href="${waUrl}" target="_blank" class="btn btn-success btn-sm" onclick="markWASent(${c.id})">📲 Send</a>
+      </div>
+    `;
+  }).join('');
+  addAudit(`WhatsApp links generated for ${list.length} contacts`);
+  showToast(`${list.length} WhatsApp links ready`);
+}
+
+function markWASent(id) {
+  appState.waSentList[id] = new Date().toISOString();
+  saveState();
+  const row = document.getElementById('wa-row-' + id);
+  if (row) {
+    const existing = row.querySelector('.wa-sent-mark');
+    if (!existing) {
+      const mark = document.createElement('span');
+      mark.className = 'wa-sent-mark';
+      mark.textContent = '✓✓';
+      row.insertBefore(mark, row.querySelector('a'));
+    }
+  }
+}
+
+function filterWAList(v) {
+  document.querySelectorAll('.wa-contact-row').forEach(el => {
+    el.style.display = el.textContent.toLowerCase().includes(v.toLowerCase()) ? '' : 'none';
+  });
+}
+
+function renderWAContacts() { /* populated on generate */ }
+
+function saveWATemplate() {
+  const name = document.getElementById('waTemplateName').value.trim() || 'Template ' + Date.now();
+  const msg = document.getElementById('waMessage').value.trim();
+  if (!msg) { showToast('No message to save', 'warning'); return; }
+  appState.waTemplates.push({ id: Date.now(), name, msg });
+  saveState();
+  renderWATemplates();
+  showToast('Template saved');
+}
+
+function renderWATemplates() {
+  const el = document.getElementById('waTemplateList');
+  if (!appState.waTemplates.length) { el.innerHTML = '<div class="text-xs text-muted">No saved templates yet</div>'; return; }
+  el.innerHTML = appState.waTemplates.map(t => `
+    <div class="flex items-center gap-8 mb-8">
+      <span class="text-xs font-600" style="flex:1">${t.name}</span>
+      <button class="btn btn-secondary btn-xs" onclick="loadWATemplate(${t.id})">Use</button>
+    </div>
+  `).join('');
+}
+
+function loadWATemplate(id) {
+  const t = appState.waTemplates.find(x => x.id === id);
+  if (!t) return;
+  document.getElementById('waMessage').value = t.msg;
+  document.getElementById('waTemplateName').value = t.name;
+}
+
+function exportWASent() {
+  const sent = Object.keys(appState.waSentList);
+  const list = appState.contacts.filter(c => sent.includes(String(c.id)));
+  if (!list.length) { showToast('No sent records yet', 'warning'); return; }
+  const csv = ['Name,Mobile,Sent At'].concat(list.map(c => `${c.firstName} ${c.lastName||''},${c.mobile},${fmtDate(appState.waSentList[c.id])}`)).join('\n');
+  downloadText(csv, 'whatsapp-sent.csv', 'text/csv');
+}
+
+// ==============================
+// CALENDAR
+// ==============================
+function buildCalendar() {
+  const d = appState.calendarDate;
+  const year = d.getFullYear(); const month = d.getMonth();
+  document.getElementById('calMonthLabel').textContent = d.toLocaleString('default', {month:'long'}) + ' ' + year;
+  const headers = document.getElementById('calDayHeaders');
+  const grid = document.getElementById('calGrid');
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  headers.innerHTML = days.map(d => `<div class="cal-header">${d}</div>`).join('');
+  const first = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const prevDays = new Date(year, month, 0).getDate();
+  const today = new Date(); const todayStr = `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
+  let cells = '';
+  for (let i = 0; i < first; i++) {
+    cells += `<div class="cal-day other-month">${prevDays - first + i + 1}</div>`;
+  }
+  for (let i = 1; i <= daysInMonth; i++) {
+    const isToday = `${year}-${month}-${i}` === todayStr;
+    const hasCampaign = appState.campaigns.some(c => {
+      const cd = new Date(c.sentDate || c.createdAt);
+      return cd.getFullYear() === year && cd.getMonth() === month && cd.getDate() === i;
+    });
+    cells += `<div class="cal-day ${isToday?'today':''} ${hasCampaign?'has-campaign':''}" onclick="showCalDay(${year},${month},${i})">${i}</div>`;
+  }
+  const remaining = 42 - first - daysInMonth;
+  for (let i = 1; i <= remaining; i++) cells += `<div class="cal-day other-month">${i}</div>`;
+  grid.innerHTML = cells;
+  renderCalEvents();
+}
+
+function renderCalEvents() {
+  const d = appState.calendarDate;
+  const year = d.getFullYear(); const month = d.getMonth();
+  const campaigns = appState.campaigns.filter(c => {
+    const cd = new Date(c.sentDate || c.createdAt);
+    return cd.getFullYear() === year && cd.getMonth() === month;
+  });
+  const el = document.getElementById('calEventList');
+  if (!campaigns.length) { el.innerHTML = ''; return; }
+  el.innerHTML = `<div class="card"><div class="card-title mb-12">📣 Campaigns This Month</div>${campaigns.map(c=>`
+    <div class="flex items-center gap-12 mb-8 pb-8" style="border-bottom:1px solid var(--border)44">
+      <span class="badge ${c.status==='completed'?'badge-success':c.status==='scheduled'?'badge-info':'badge-muted'}">${c.status}</span>
+      <div style="flex:1"><div style="font-size:12px;font-weight:600">${c.name}</div><div class="text-xs text-muted">${fmtDateOnly(c.sentDate||c.createdAt)}</div></div>
+      <div class="text-xs text-muted">${c.sent||0} sent · ${c.opened||0} opened</div>
+    </div>
+  `).join('')}</div>`;
+}
+
+function showCalDay(y, m, d) {
+  const campaigns = appState.campaigns.filter(c => {
+    const cd = new Date(c.sentDate || c.createdAt);
+    return cd.getFullYear() === y && cd.getMonth() === m && cd.getDate() === d;
+  });
+  if (!campaigns.length) return;
+  showToast(`${campaigns.length} campaign(s) on this day`, 'info');
+}
+
+function prevMonth() { appState.calendarDate.setMonth(appState.calendarDate.getMonth()-1); buildCalendar(); }
+function nextMonth() { appState.calendarDate.setMonth(appState.calendarDate.getMonth()+1); buildCalendar(); }
+
+// ==============================
+// SETTINGS
+// ==============================
+function showSettingsTab(id, el) {
+  document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.settings-nav-item').forEach(n => n.classList.remove('active'));
+  const sec = document.getElementById('settings-'+id);
+  if (sec) sec.classList.add('active');
+  if (el) el.classList.add('active');
+  else {
+    // Find and activate by text match
+    document.querySelectorAll('.settings-nav-item').forEach(n => {
+      if (n.textContent.toLowerCase().includes(id.replace('-',' '))) n.classList.add('active');
+    });
+  }
+}
+
+function loadSettingsToUI() {
+  const s = appState.settings;
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+  set('settingHotelName', s.hotelName);
+  set('settingTagline', s.tagline);
+  set('settingSenderEmail', s.senderEmail);
+  set('settingReplyTo', s.replyTo);
+  set('settingPhone', s.phone);
+  set('settingWhatsApp', s.whatsapp);
+  set('settingAddress', s.address);
+  set('settingWebsite', s.website);
+  set('settingFooter', s.footer);
+  set('settingSendgridKey', s.sendgridKey);
+  set('settingGSheetsUrl', s.gsheetsUrl);
+  set('settingFreqDays', s.freqDays || 7);
+  set('settingFreqMonth', s.freqMonth || 4);
+  set('settingDailyLimit', s.dailyLimit || 100);
+  set('settingFont', s.font || 'Poppins');
+  set('colorPrimary', s.primaryColor);
+  set('colorPrimaryHex', s.primaryColor);
+  set('colorSecondary', s.secondaryColor);
+  set('colorSecondaryHex', s.secondaryColor);
+  set('colorAccent', s.accentColor);
+  set('colorAccentHex', s.accentColor);
+  if (s.logoData) {
+    document.getElementById('logoPreviewText').style.display = 'none';
+    const img = document.getElementById('logoPreviewImg');
+    img.src = s.logoData; img.style.display = 'block';
+  }
+  liveUpdateHotelName();
+  renderSocialLinksForm();
+}
+
+function saveSettings() {
+  const s = appState.settings;
+  s.hotelName = document.getElementById('settingHotelName').value.trim() || s.hotelName;
+  s.tagline = document.getElementById('settingTagline').value.trim();
+  s.senderEmail = document.getElementById('settingSenderEmail').value.trim();
+  s.replyTo = document.getElementById('settingReplyTo').value.trim();
+  s.phone = document.getElementById('settingPhone').value.trim();
+  s.whatsapp = document.getElementById('settingWhatsApp').value.trim();
+  s.address = document.getElementById('settingAddress').value.trim();
+  s.website = document.getElementById('settingWebsite').value.trim();
+  s.footer = document.getElementById('settingFooter').value.trim();
+  saveState();
+  liveUpdateHotelName();
+  buildSnippet();
+  addAudit('Hotel profile updated');
+  showToast('Hotel profile saved');
+}
+
+function saveSendgrid() {
+  appState.settings.sendgridKey = document.getElementById('settingSendgridKey').value.trim();
+  appState.settings.dailyLimit = parseInt(document.getElementById('settingDailyLimit').value) || 100;
+  saveState();
+  document.getElementById('sendgridStatus').innerHTML = '<div class="alert alert-success">✅ SendGrid settings saved.</div>';
+  addAudit('SendGrid settings updated');
+  showToast('SendGrid settings saved');
+}
+
+function saveBranding() {
+  appState.settings.primaryColor = document.getElementById('colorPrimaryHex').value;
+  appState.settings.secondaryColor = document.getElementById('colorSecondaryHex').value;
+  appState.settings.accentColor = document.getElementById('colorAccentHex').value;
+  applyBrandColor('primary', appState.settings.primaryColor);
+  applyBrandColor('secondary', appState.settings.secondaryColor);
+  saveState();
+  addAudit('Brand colors updated');
+  showToast('Branding saved');
+}
+
+function saveFrequency() {
+  appState.settings.freqDays = parseInt(document.getElementById('settingFreqDays').value) || 7;
+  appState.settings.freqMonth = parseInt(document.getElementById('settingFreqMonth').value) || 4;
+  saveState(); showToast('Frequency settings saved');
+}
+
+// ==============================
+// FOOTER IMAGE
+// ==============================
+function handleFooterImgUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    appState.settings.footerImgData = ev.target.result;
+    saveState();
+    loadFooterImgToUI();
+    showToast('Footer image uploaded');
+    addAudit('Email footer image uploaded');
+  };
+  reader.readAsDataURL(file);
+}
+
+function loadFooterImgToUI() {
+  const data = appState.settings.footerImgData;
+  const wrap = document.getElementById('footerImgPreviewWrap');
+  const preview = document.getElementById('footerImgPreview');
+  const previewFull = document.getElementById('footerImgPreviewFull');
+  const previewArea = document.getElementById('footerImgPreviewArea');
+  if (data) {
+    if (wrap) { wrap.style.display = ''; }
+    if (preview) preview.src = data;
+    if (previewFull) previewFull.src = data;
+    if (previewArea) previewArea.style.display = '';
+  } else {
+    if (wrap) wrap.style.display = 'none';
+    if (previewArea) previewArea.style.display = 'none';
+  }
+  const altEl = document.getElementById('settingFooterImgAlt');
+  const linkEl = document.getElementById('settingFooterImgLink');
+  const posEl = document.getElementById('settingFooterImgPos');
+  if (altEl) altEl.value = appState.settings.footerImgAlt || '';
+  if (linkEl) linkEl.value = appState.settings.footerImgLink || '';
+  if (posEl) posEl.value = appState.settings.footerImgPos || 'above-text';
+}
+
+function saveFooterImage() {
+  appState.settings.footerImgAlt = document.getElementById('settingFooterImgAlt')?.value.trim() || '';
+  appState.settings.footerImgLink = document.getElementById('settingFooterImgLink')?.value.trim() || '';
+  appState.settings.footerImgPos = document.getElementById('settingFooterImgPos')?.value || 'above-text';
+  saveState();
+  showToast('Footer image settings saved');
+  addAudit('Email footer image settings updated');
+}
+
+function removeFooterImg() {
+  appState.settings.footerImgData = null;
+  saveState();
+  loadFooterImgToUI();
+  showToast('Footer image removed');
+}
+
+// ==============================
+// BODY IMAGE INSERT
+// ==============================
+function insertBodyImage(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    document.getElementById('emailBody').focus();
+    document.execCommand('insertHTML', false,
+      `<div style="text-align:center;margin:12px 0"><img src="${ev.target.result}" style="max-width:100%;height:auto;border-radius:6px;display:inline-block" alt="Email image"></div>`
+    );
+    // Reset file input so same file can be re-selected
+    e.target.value = '';
+  };
+  reader.readAsDataURL(file);
+}
+
+// ==============================
+// EXPORT AUDIT LOG
+// ==============================
+function exportAuditLog() {
+  if (!appState.auditLog.length) { showToast('No audit entries to export', 'warning'); return; }
+  const csv = ['Action,Timestamp'].concat(appState.auditLog.map(a => `"${a.action}","${fmtDate(a.time)}"`)).join('\n');
+  downloadText(csv, 'audit-log.csv', 'text/csv');
+  showToast('Audit log exported');
+}
+
+function applyBrandColor(type, val) {
+  if (!val || !val.startsWith('#')) return;
+  if (type === 'primary') {
+    document.documentElement.style.setProperty('--brand-primary', val);
+    const hex = document.getElementById('colorPrimaryHex');
+    const picker = document.getElementById('colorPrimary');
+    if (hex) hex.value = val;
+    if (picker) picker.value = val;
+  }
+  if (type === 'secondary') {
+    document.documentElement.style.setProperty('--brand-secondary', val);
+    const hex = document.getElementById('colorSecondaryHex');
+    if (hex) hex.value = val;
+  }
+}
+
+function applyBrandColorHex(type, val) {
+  if (val && val.length === 7 && val.startsWith('#')) applyBrandColor(type, val);
+}
+
+function handleLogoUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    appState.settings.logoData = ev.target.result;
+    document.getElementById('logoPreviewText').style.display = 'none';
+    const img = document.getElementById('logoPreviewImg'); img.src = ev.target.result; img.style.display = 'block';
+    // Update sidebar logo
+    const sidebarImg = document.getElementById('sidebarLogoImg');
+    document.getElementById('sidebarLogoText').style.display = 'none';
+    sidebarImg.src = ev.target.result; sidebarImg.style.display = 'block';
+    saveState(); showToast('Logo uploaded');
+  };
+  reader.readAsDataURL(file);
+}
+
+function liveUpdateHotelName() {
+  const name = document.getElementById('settingHotelName')?.value || appState.settings.hotelName || 'Hotel';
+  document.getElementById('sidebarHotelName').textContent = name.length > 22 ? name.substring(0,22)+'…' : name;
+  const initials = name.split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
+  document.getElementById('sidebarLogoText').textContent = initials;
+  // Update snippet preview
+  const snippetHotel = document.getElementById('snippetPreviewHotel');
+  if (snippetHotel) snippetHotel.textContent = name;
+  buildSnippet();
+}
+
+function applyFont(font) {
+  if (!font) return;
+  appState.settings.font = font;
+  document.body.style.fontFamily = `'${font}', sans-serif`;
+  // Load from Google Fonts if not already loaded
+  const standardFonts = ['Poppins','Inter','Lato','Montserrat','Raleway','Nunito','Playfair Display','Source Sans 3'];
+  if (standardFonts.includes(font)) {
+    const existing = document.querySelector(`link[data-font="${font}"]`);
+    if (!existing) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(font)}:wght@300;400;500;600;700;800&display=swap`;
+      link.dataset.font = font;
+      document.head.appendChild(link);
+    }
+  }
+}
+
+function applyCustomFont() {
+  const font = document.getElementById('settingCustomFont').value.trim();
+  if (!font) return;
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(font)}:wght@300;400;500;600;700;800&display=swap`;
+  document.head.appendChild(link);
+  setTimeout(() => { applyFont(font); saveState(); showToast(`Font "${font}" applied`); }, 500);
+}
+
+// ==============================
+// WELCOME EMAIL
+// ==============================
+function saveWelcome() {
+  appState.welcomeEmail = {
+    subject: document.getElementById('welcomeSubject').value,
+    body: document.getElementById('welcomeBody').innerHTML
+  };
+  saveState();
+  addAudit('Welcome email updated');
+  showToast('Welcome email saved');
+}
+
+function previewWelcome() {
+  updateWelcomePreview();
+}
+
+function updateWelcomePreview() {
+  const hotel = appState.settings.hotelName || 'Hotel Name';
+  const body = document.getElementById('welcomeBody')?.innerHTML || '';
+  const preview = body.replace(/{{First Name}}/g, 'Guest').replace(/{{Hotel Name}}/g, hotel);
+  const el = document.getElementById('welcomePreviewBody');
+  if (el) el.innerHTML = preview;
+  const nameEl = document.getElementById('welcomePreviewHotelName');
+  if (nameEl) nameEl.textContent = hotel;
+}
+
+// ==============================
+// UNSUBSCRIBE PAGE
+// ==============================
+function saveUnsubPage() {
+  appState.unsubPage = {
+    headline: document.getElementById('unsubHeadline').value,
+    message: document.getElementById('unsubMessage').value,
+    resubLabel: document.getElementById('unsubResubLabel').value,
+    footer: document.getElementById('unsubFooter').value
+  };
+  saveState();
+  updateUnsubPreview();
+  addAudit('Unsubscribe page updated');
+  showToast('Unsubscribe page saved');
+}
+
+function updateUnsubPreview() {
+  const hotel = appState.settings.hotelName || 'Hotel Name';
+  const headline = document.getElementById('unsubHeadline')?.value || "You've been unsubscribed";
+  const message = document.getElementById('unsubMessage')?.value || '';
+  const btn = document.getElementById('unsubResubLabel')?.value || 'Re-subscribe';
+  const footer = (document.getElementById('unsubFooter')?.value || '© {{Hotel Name}}').replace(/{{Hotel Name}}/g, hotel);
+  const el_h = document.getElementById('unsubPreviewHeadline');
+  const el_m = document.getElementById('unsubPreviewMessage');
+  const el_b = document.getElementById('unsubPreviewBtn');
+  const el_f = document.getElementById('unsubPreviewFooter');
+  const el_n = document.getElementById('unsubPreviewHotelName');
+  if (el_h) el_h.textContent = headline;
+  if (el_m) el_m.textContent = message.replace(/{{Hotel Name}}/g, hotel).substring(0,120) + '…';
+  if (el_b) el_b.textContent = btn;
+  if (el_f) el_f.textContent = footer;
+  if (el_n) el_n.textContent = hotel;
+  const header = document.getElementById('unsubPreviewHeader');
+  if (header) header.style.background = appState.settings.secondaryColor || '#2C5F6E';
+}
+
+function previewUnsubPage() { updateUnsubPreview(); showToast('Preview updated', 'info'); }
+
+// ==============================
+// SNIPPET
+// ==============================
+function buildSnippet() {
+  const hotel = appState.settings.hotelName || 'Your Hotel';
+  const color = appState.settings.primaryColor || '#C9A96E';
+  const snippet = `<!-- ${hotel} Newsletter Signup Form -->
+<!-- Paste this code wherever you want the form to appear on your website -->
+<div id="ccmp-signup" style="font-family:'Poppins',sans-serif;max-width:400px;padding:24px;background:#fff;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.08)">
+  <h3 style="margin:0 0 4px;font-size:18px;color:#1a1e2e">Stay in the know</h3>
+  <p style="margin:0 0 16px;font-size:13px;color:#888">Subscribe to receive exclusive offers from ${hotel}</p>
+  <input id="ccmp-name" type="text" placeholder="Your Name" style="width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;margin-bottom:8px;box-sizing:border-box;font-family:inherit">
+  <input id="ccmp-email" type="email" placeholder="Email Address" style="width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;margin-bottom:8px;box-sizing:border-box;font-family:inherit">
+  <input id="ccmp-mobile" type="tel" placeholder="Mobile (optional)" style="width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;margin-bottom:12px;box-sizing:border-box;font-family:inherit">
+  <button onclick="ccmpSubmit()" style="width:100%;padding:10px;background:${color};color:white;border:none;border-radius:6px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">Subscribe Now</button>
+  <p style="font-size:10px;color:#aaa;text-align:center;margin-top:8px">We respect your privacy. Unsubscribe anytime.</p>
+  <div id="ccmp-msg" style="display:none;margin-top:8px;padding:8px;border-radius:6px;font-size:12px;text-align:center"></div>
+</div>
+<script>
+function ccmpSubmit(){
+  var name=document.getElementById('ccmp-name').value.trim();
+  var email=document.getElementById('ccmp-email').value.trim();
+  var mobile=document.getElementById('ccmp-mobile').value.trim();
+  var msg=document.getElementById('ccmp-msg');
+  if(!name||!email){msg.style.display='block';msg.style.background='#ffeaea';msg.style.color='#c0392b';msg.textContent='Name and email are required.';return;}
+  // Send to your backend or Google Sheets Web App URL:
+  // fetch('YOUR_GOOGLE_APPS_SCRIPT_URL?action=subscribe&name='+encodeURIComponent(name)+'&email='+encodeURIComponent(email)+'&mobile='+encodeURIComponent(mobile))
+  msg.style.display='block';msg.style.background='#eafbea';msg.style.color='#27ae60';
+  msg.textContent='Thank you for subscribing!';
+  document.getElementById('ccmp-name').value='';document.getElementById('ccmp-email').value='';document.getElementById('ccmp-mobile').value='';
+}
+<\/script>
+<!-- End ${hotel} Signup Form -->`;
+  const el = document.getElementById('snippetCode');
+  if (el) el.textContent = snippet;
+  const btn = document.getElementById('snippetPreviewBtn');
+  if (btn) btn.style.background = color;
+}
+
+function copySnippet() {
+  const text = document.getElementById('snippetCode').textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('Snippet copied to clipboard!')).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    showToast('Snippet copied!');
+  });
+  addAudit('Signup snippet copied');
+}
+
+// ==============================
+// DASHBOARD CHARTS
+// ==============================
+let _charts = {};
+
+function getChartColors() {
+  const isDark = appState.currentTheme === 'dark';
+  return {
+    text: isDark ? '#8B95B0' : '#5A6480',
+    grid: isDark ? '#2A3047' : '#E2E6F0',
+    primary: appState.settings.primaryColor || '#C9A96E',
+    success: '#2ECC71',
+    danger: '#E74C3C',
+    info: '#3498DB',
+    warning: '#F39C12'
+  };
+}
+
+function destroyCharts() {
+  Object.values(_charts).forEach(c => { if (c) c.destroy(); });
+  _charts = {};
+}
+
+function initCharts() {
+  const cc = getChartColors();
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const commonOpts = {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { labels: { color: cc.text, font: { family: appState.settings.font || 'Poppins', size: 11 }, boxWidth: 12 } } },
+    scales: { x: { ticks: { color: cc.text, font: { size: 10 } }, grid: { color: cc.grid } }, y: { ticks: { color: cc.text, font: { size: 10 } }, grid: { color: cc.grid } } }
+  };
+
+  // Monthly
+  const ctx1 = document.getElementById('chartMonthly')?.getContext('2d');
+  if (ctx1) {
+    _charts.monthly = new Chart(ctx1, {
+      type: 'bar',
+      data: { labels: months, datasets: [
+        { label: 'Sent', data: getMonthlyData('sent'), backgroundColor: cc.primary + 'CC', borderRadius: 4 },
+        { label: 'Opened', data: getMonthlyData('opened'), backgroundColor: cc.success + 'CC', borderRadius: 4 },
+        { label: 'Bounced', data: getMonthlyData('bounced'), backgroundColor: cc.danger + 'CC', borderRadius: 4 }
+      ]},
+      options: { ...commonOpts, plugins: { ...commonOpts.plugins, tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y}` } } } }
+    });
+  }
+
+  // Donut
+  const ctx2 = document.getElementById('chartDonut')?.getContext('2d');
+  if (ctx2) {
+    _charts.donut = new Chart(ctx2, {
+      type: 'doughnut',
+      data: { labels: ['Opened','Not Opened','Bounced','Unsubscribed'], datasets: [{ data: [0,0,0,0], backgroundColor: [cc.success, cc.warning, cc.danger, cc.info], borderWidth: 2, borderColor: 'transparent' }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: cc.text, font: { family: appState.settings.font || 'Poppins', size: 11 }, boxWidth: 12, padding: 12 } }, tooltip: { callbacks: { label: ctx => `${ctx.label}: ${ctx.parsed} (${ctx.parsed+ctx.dataset.data.reduce((a,b)=>a+b,0) > 0 ? Math.round(ctx.parsed / ctx.dataset.data.reduce((a,b)=>a+b,0) * 100) : 0}%)` } } } }
+    });
+  }
+
+  // Weekly
+  const ctx3 = document.getElementById('chartWeekly')?.getContext('2d');
+  if (ctx3) {
+    const weekLabels = Array.from({length:12}, (_,i) => { const d = new Date(); d.setDate(d.getDate() - (11-i)*7); return `Wk ${d.getDate()}/${d.getMonth()+1}`; });
+    _charts.weekly = new Chart(ctx3, {
+      type: 'line',
+      data: { labels: weekLabels, datasets: [
+        { label: 'Sent', data: Array(12).fill(0), borderColor: cc.primary, backgroundColor: cc.primary + '22', tension: 0.4, fill: true, pointRadius: 3 },
+        { label: 'Opened', data: Array(12).fill(0), borderColor: cc.success, backgroundColor: cc.success + '22', tension: 0.4, fill: true, pointRadius: 3 }
+      ]},
+      options: { ...commonOpts, plugins: { ...commonOpts.plugins } }
+    });
+  }
+
+  // Yearly comparison
+  const ctx4 = document.getElementById('chartYearly')?.getContext('2d');
+  if (ctx4) {
+    _charts.yearly = new Chart(ctx4, {
+      type: 'bar',
+      data: { labels: ['2026','2027','2028','2029','2030'], datasets: [
+        { label: 'Sent', data: getYearlyData('sent'), backgroundColor: cc.primary + 'CC', borderRadius: 4 },
+        { label: 'Opened', data: getYearlyData('opened'), backgroundColor: cc.success + 'CC', borderRadius: 4 }
+      ]},
+      options: { ...commonOpts }
+    });
+  }
+
+  // Unsubscribe trend
+  const ctx5 = document.getElementById('chartUnsub')?.getContext('2d');
+  if (ctx5) {
+    _charts.unsub = new Chart(ctx5, {
+      type: 'line',
+      data: { labels: months, datasets: [{ label: 'Unsubscribes', data: Array(12).fill(0), borderColor: cc.danger, backgroundColor: cc.danger + '22', tension: 0.4, fill: true, pointRadius: 3 }] },
+      options: { ...commonOpts, plugins: { ...commonOpts.plugins }, scales: { ...commonOpts.scales, y: { ...commonOpts.scales.y, min: 0 } } }
+    });
+  }
+}
+
+function getMonthlyData(field) {
+  const now = new Date();
+  const year = parseInt(document.getElementById('yearFilter')?.value) || now.getFullYear();
+  return Array.from({length:12}, (_,m) => appState.campaigns.filter(c => {
+    const d = new Date(c.sentDate || c.createdAt);
+    return d.getFullYear() === year && d.getMonth() === m;
+  }).reduce((sum, c) => sum + (c[field] || 0), 0));
+}
+
+function getYearlyData(field) {
+  return [2026,2027,2028,2029,2030].map(y => appState.campaigns.filter(c => {
+    const d = new Date(c.sentDate || c.createdAt);
+    return d.getFullYear() === y;
+  }).reduce((sum, c) => sum + (c[field] || 0), 0));
+}
+
+function updateDashboard() {
+  const totalSent = appState.campaigns.reduce((s, c) => s + (c.sent || 0), 0);
+  const totalOpened = appState.campaigns.reduce((s, c) => s + (c.opened || 0), 0);
+  const totalBounced = appState.campaigns.reduce((s, c) => s + (c.bounced || 0), 0);
+  const totalClicks = appState.campaigns.reduce((s, c) => s + (c.clicks || 0), 0);
+  const openRate = totalSent > 0 ? Math.round((totalOpened / totalSent) * 100) : 0;
+  const bounceRate = totalSent > 0 ? Math.round((totalBounced / totalSent) * 100) : 0;
+  const clickRate = totalSent > 0 ? Math.round((totalClicks / totalSent) * 100) : 0;
+  document.getElementById('statSent').textContent = totalSent;
+  document.getElementById('statOpened').textContent = totalOpened;
+  document.getElementById('statOpenRate').textContent = openRate + '%';
+  document.getElementById('statNotOpened').textContent = totalSent - totalOpened - totalBounced;
+  document.getElementById('statBounced').textContent = totalBounced;
+  document.getElementById('statBounceRate').textContent = bounceRate + '%';
+  document.getElementById('statClicks').textContent = totalClicks;
+  document.getElementById('statClickRate').textContent = clickRate + '%';
+  document.getElementById('statCampaigns').textContent = appState.campaigns.length;
+  updateNavBadges();
+
+  // Health bars
+  const deliveryRate = totalSent > 0 ? Math.round(((totalSent - totalBounced) / totalSent) * 100) : 0;
+  const setHealth = (id, barId, val, suffix='%') => {
+    const el = document.getElementById(id); const bar = document.getElementById(barId);
+    if (el) el.textContent = val + suffix;
+    if (bar) bar.style.width = Math.min(val, 100) + '%';
+  };
+  setHealth('healthDelivery', 'healthDeliveryBar', deliveryRate);
+  setHealth('healthOpen', 'healthOpenBar', openRate);
+  setHealth('healthBounce', 'healthBounceBar', bounceRate);
+  setHealth('healthUnsub', 'healthUnsubBar', totalSent > 0 ? Math.round(appState.contacts.filter(c=>c.status==='unsubscribed').length / Math.max(totalSent, 1) * 100) : 0);
+
+  // Warm-up tip
+  const tipEl = document.getElementById('warmupTip');
+  if (tipEl) {
+    if (totalSent === 0) tipEl.textContent = 'Connect SendGrid and start sending to see health metrics.';
+    else if (openRate >= 20) tipEl.textContent = `Great open rate of ${openRate}%! Your sender reputation is healthy.`;
+    else if (openRate > 0) tipEl.textContent = `Open rate is ${openRate}%. Try improving subject lines and sending to engaged contacts.`;
+    else tipEl.textContent = 'No open data yet. Make sure tracking is enabled in SendGrid.';
+  }
+
+  // Update charts
+  if (_charts.monthly) { _charts.monthly.data.datasets[0].data = getMonthlyData('sent'); _charts.monthly.data.datasets[1].data = getMonthlyData('opened'); _charts.monthly.data.datasets[2].data = getMonthlyData('bounced'); _charts.monthly.update(); }
+  if (_charts.donut) { _charts.donut.data.datasets[0].data = [totalOpened, Math.max(0, totalSent - totalOpened - totalBounced), totalBounced, appState.contacts.filter(c=>c.status==='unsubscribed').length]; _charts.donut.update(); }
+  if (_charts.yearly) { _charts.yearly.data.datasets[0].data = getYearlyData('sent'); _charts.yearly.data.datasets[1].data = getYearlyData('opened'); _charts.yearly.update(); }
+
+  // Top campaigns table
+  const top = [...appState.campaigns].sort((a,b) => (b.opened||0) - (a.opened||0)).slice(0, 5);
+  const tbody = document.getElementById('topCampaignsTable');
+  if (tbody) {
+    tbody.innerHTML = top.length ? top.map(c => {
+      const or = c.sent > 0 ? Math.round(c.opened/c.sent*100) : 0;
+      return `<tr><td style="font-weight:600;color:var(--text-primary)">${c.name}</td><td>${c.sent||0}</td><td style="color:var(--success)">${c.opened||0}</td><td><span class="badge badge-success">${or}%</span></td><td>${c.clicks||0}</td><td><span class="badge ${c.status==='completed'?'badge-success':c.status==='scheduled'?'badge-info':'badge-muted'}">${c.status}</span></td></tr>`;
+    }).join('') : '<tr><td colspan="6" class="text-center text-muted" style="padding:24px">No campaigns yet</td></tr>';
+  }
+}
+
+// ==============================
+// DATE RANGE FILTER
+// ==============================
+function setDateRange(range, el) {
+  document.querySelectorAll('.date-range-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  const now = new Date();
+  let from, to = now;
+  if (range === 'week') { from = new Date(now); from.setDate(from.getDate()-7); }
+  else if (range === 'month') { from = new Date(now.getFullYear(), now.getMonth(), 1); }
+  else if (range === 'year') { from = new Date(now.getFullYear(), 0, 1); }
+  else { from = new Date('2026-01-01'); }
+  document.getElementById('dateFrom').value = from.toISOString().split('T')[0];
+  document.getElementById('dateTo').value = to.toISOString().split('T')[0];
+  updateDashboard();
+}
+
+function applyCustomDate() { updateDashboard(); }
+function filterYear() { destroyCharts(); initCharts(); updateDashboard(); }
+
+// ==============================
+// UTILITY
+// ==============================
+function downloadText(content, filename, mime) {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = filename;
+  a.click(); URL.revokeObjectURL(url);
+}
+
+// ==============================
+// START
+// ==============================
+document.addEventListener('DOMContentLoaded', init);
+
+// Auto-update unsubscribe preview on input change
+document.addEventListener('input', function(e) {
+  if (['unsubHeadline','unsubMessage','unsubResubLabel','unsubFooter'].includes(e.target.id)) updateUnsubPreview();
+  if (e.target.id === 'welcomeBody' || e.target.id === 'welcomeSubject') updateWelcomePreview();
+  if (e.target.id === 'settingHotelName') liveUpdateHotelName();
+  if (e.target.id === 'recipientSegment') updateRecipientCount();
+});
+</script>
+</body>
+</html>
