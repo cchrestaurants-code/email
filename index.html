@@ -940,7 +940,6 @@ textarea.form-control { min-height: 100px; resize: vertical; }
     </div>
     <div class="topbar-right">
       <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙 Dark</button>
-      <button class="btn-topbar" onclick="showPage('compose',document.querySelector('.nav-item:nth-child(6))'))">+ New Campaign</button>
     </div>
   </div>
 
@@ -1315,8 +1314,13 @@ textarea.form-control { min-height: 100px; resize: vertical; }
           <!-- Social Icons -->
           <div class="card mb-16">
             <div class="card-title mb-8">🌐 Social Icons in Email</div>
-            <div class="text-xs text-muted mb-12">Toggle which social icons appear in the email footer</div>
+            <div class="text-xs text-muted mb-12">Toggle which social icons appear in the email footer. Icons only show if the link is set in Settings → Social Links.</div>
             <div class="social-toggle-grid" id="socialToggles"></div>
+            <div class="divider"></div>
+            <div class="text-xs text-muted mb-8 font-600">LIVE PREVIEW</div>
+            <div style="background:white;border-radius:var(--radius-sm);padding:12px;text-align:center;border:1px solid var(--border)" id="socialIconsLivePreview">
+              <div style="font-size:11px;color:#aaa">Toggle icons above to see them here</div>
+            </div>
           </div>
         </div>
       </div>
@@ -1517,19 +1521,16 @@ textarea.form-control { min-height: 100px; resize: vertical; }
       <div class="flex justify-between items-center mb-16">
         <div>
           <div style="font-size:14px;font-weight:700">Welcome Email Editor</div>
-          <div class="text-xs text-muted mt-4">Customize the email sent to new newsletter subscribers</div>
+          <div class="text-xs text-muted mt-4">Customize the email sent to new newsletter subscribers. Preview updates live as you type.</div>
         </div>
-        <div class="flex gap-8">
-          <button class="btn btn-secondary" onclick="previewWelcome()">👁️ Preview</button>
-          <button class="btn btn-primary" onclick="saveWelcome()">💾 Save Welcome Email</button>
-        </div>
+        <button class="btn btn-primary" onclick="saveWelcome()">💾 Save Welcome Email</button>
       </div>
       <div class="grid-2">
         <div class="card">
           <div class="card-title mb-12">✉️ Welcome Email Settings</div>
           <div class="form-group">
             <label class="form-label">Subject Line</label>
-            <input type="text" class="form-control" id="welcomeSubject" value="Welcome to {{Hotel Name}} — Thank You for Subscribing!">
+            <input type="text" class="form-control" id="welcomeSubject" value="Welcome to {{Hotel Name}} — Thank You for Subscribing!" oninput="updateWelcomePreview()">
           </div>
           <div class="form-group">
             <label class="form-label">Email Body</label>
@@ -1537,9 +1538,18 @@ textarea.form-control { min-height: 100px; resize: vertical; }
               <button class="composer-btn" onclick="execFormatW('bold')"><b>B</b></button>
               <button class="composer-btn" onclick="execFormatW('italic')"><i>I</i></button>
               <button class="composer-btn" onclick="execFormatW('underline')"><u>U</u></button>
-              <button class="composer-btn" onclick="execFormatW('justifyCenter')">≡</button>
+              <button class="composer-btn" onclick="execFormatW('justifyLeft')">≡L</button>
+              <button class="composer-btn" onclick="execFormatW('justifyCenter')">≡C</button>
+              <div class="composer-sep"></div>
+              <input type="color" title="Text Color" onchange="execFormatW2('foreColor',this.value)" style="width:26px;height:24px;border:none;background:none;cursor:pointer;padding:0;">
+              <select class="composer-btn" onchange="execFormatW2('fontSize',this.value)" style="padding:2px 4px;">
+                <option value="2">Small</option>
+                <option value="3" selected>Normal</option>
+                <option value="4">Large</option>
+                <option value="5">X-Large</option>
+              </select>
             </div>
-            <div class="composer-area" id="welcomeBody" contenteditable="true" style="min-height:200px">
+            <div class="composer-area" id="welcomeBody" contenteditable="true" style="min-height:200px" oninput="updateWelcomePreview()">
               <p>Dear {{First Name}},</p>
               <br>
               <p>Thank you for subscribing to our newsletter! We're delighted to have you as part of the <strong>{{Hotel Name}}</strong> family.</p>
@@ -1551,19 +1561,31 @@ textarea.form-control { min-height: 100px; resize: vertical; }
               <p>Warm regards,<br>The Team at {{Hotel Name}}</p>
             </div>
           </div>
+          <div class="form-group mt-12">
+            <label class="form-label">Personalization Tags — click to insert</label>
+            <div class="tag-list">
+              <span class="tag" onclick="insertWelcomeTag('{{First Name}}')">{{First Name}}</span>
+              <span class="tag" onclick="insertWelcomeTag('{{Hotel Name}}')">{{Hotel Name}}</span>
+              <span class="tag" onclick="insertWelcomeTag('{{Email}}')">{{Email}}</span>
+            </div>
+          </div>
         </div>
         <div class="card">
-          <div class="card-title mb-12">📱 Mobile Preview</div>
-          <div style="background:#f0f2f8;border-radius:12px;padding:16px;max-width:320px;margin:0 auto;">
+          <div class="card-title mb-4">📱 Live Preview</div>
+          <div class="text-xs text-muted mb-12">Updates instantly as you type</div>
+          <div style="background:#f0f2f8;border-radius:12px;padding:16px;">
             <div style="background:white;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
-              <div id="welcomePreviewBanner" style="padding:20px;text-align:center;background:var(--brand-secondary)">
-                <div id="welcomePreviewLogo" style="font-size:20px;font-weight:800;color:white" id="welcomePreviewHotelName">Hotel Name</div>
+              <div style="padding:6px 12px;background:#eee;font-size:10px;color:#888">
+                <strong>Subject:</strong> <span id="welcomePreviewSubject">Welcome to Hotel Name</span>
+              </div>
+              <div id="welcomePreviewBanner" style="padding:20px;text-align:center;background:#2C5F6E">
+                <div style="font-size:18px;font-weight:800;color:white" id="welcomePreviewHotelName">Hotel Name</div>
               </div>
               <div style="padding:16px;font-size:12px;line-height:1.7;color:#333" id="welcomePreviewBody">
                 Preview will appear here
               </div>
-              <div style="padding:12px 16px;background:#f9f9f9;font-size:10px;color:#888;text-align:center;border-top:1px solid #eee">
-                <a href="#" style="color:#888">Unsubscribe</a> · Powered by {{Hotel Name}}
+              <div style="padding:10px 16px;background:#f9f9f9;font-size:10px;color:#888;text-align:center;border-top:1px solid #eee">
+                <a href="#" style="color:#aaa">Unsubscribe</a>
               </div>
             </div>
           </div>
@@ -1583,6 +1605,19 @@ textarea.form-control { min-height: 100px; resize: vertical; }
       <div class="grid-2">
         <div class="card">
           <div class="card-title mb-12">✏️ Page Content</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Emoji / Icon <span class="text-xs text-muted">(leave blank to hide)</span></label>
+              <input type="text" class="form-control" id="unsubEmoji" value="😔" placeholder="e.g. 😔 or leave blank">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Headline Font Color</label>
+              <div class="color-row">
+                <input type="color" class="color-preview" id="unsubHeadlineColor" value="#1a1e2e" onchange="updateUnsubPreview()">
+                <input type="text" class="form-control" id="unsubHeadlineColorHex" value="#1a1e2e" oninput="syncColorPicker('unsubHeadlineColor','unsubHeadlineColorHex');updateUnsubPreview()" style="flex:1">
+              </div>
+            </div>
+          </div>
           <div class="form-group">
             <label class="form-label">Headline</label>
             <input type="text" class="form-control" id="unsubHeadline" value="You've been unsubscribed">
@@ -1594,6 +1629,13 @@ textarea.form-control { min-height: 100px; resize: vertical; }
 If you unsubscribed by mistake, you can re-subscribe below.</textarea>
           </div>
           <div class="form-group">
+            <label class="form-label">Message Font Color</label>
+            <div class="color-row">
+              <input type="color" class="color-preview" id="unsubMsgColor" value="#555555" onchange="updateUnsubPreview()">
+              <input type="text" class="form-control" id="unsubMsgColorHex" value="#555555" oninput="syncColorPicker('unsubMsgColor','unsubMsgColorHex');updateUnsubPreview()" style="flex:1">
+            </div>
+          </div>
+          <div class="form-group">
             <label class="form-label">Re-subscribe Button Label</label>
             <input type="text" class="form-control" id="unsubResubLabel" value="Re-subscribe to our newsletter">
           </div>
@@ -1601,7 +1643,6 @@ If you unsubscribed by mistake, you can re-subscribe below.</textarea>
             <label class="form-label">Footer Note</label>
             <input type="text" class="form-control" id="unsubFooter" value="© {{Hotel Name}} · All rights reserved">
           </div>
-          <button class="btn btn-secondary mt-8" onclick="previewUnsubPage()">👁️ Preview Page</button>
         </div>
         <div class="card">
           <div class="card-title mb-12">📱 Live Preview</div>
@@ -1611,9 +1652,9 @@ If you unsubscribed by mistake, you can re-subscribe below.</textarea>
                 <div style="font-size:18px;font-weight:800;color:white" id="unsubPreviewHotelName">Hotel Name</div>
               </div>
               <div class="unsub-preview-body">
-                <div style="font-size:28px;margin-bottom:8px">😔</div>
-                <div style="font-size:16px;font-weight:700;margin-bottom:8px" id="unsubPreviewHeadline">You've been unsubscribed</div>
-                <div style="font-size:12px;color:#666;margin-bottom:16px" id="unsubPreviewMessage">We're sorry to see you go...</div>
+                <div style="font-size:28px;margin-bottom:8px" id="unsubPreviewEmoji">😔</div>
+                <div style="font-size:16px;font-weight:700;margin-bottom:8px;color:#1a1e2e" id="unsubPreviewHeadline">You've been unsubscribed</div>
+                <div style="font-size:12px;color:#555;margin-bottom:16px" id="unsubPreviewMessage">We're sorry to see you go...</div>
                 <button style="background:#C9A96E;color:white;border:none;padding:8px 16px;border-radius:6px;font-size:12px;cursor:pointer" id="unsubPreviewBtn">Re-subscribe</button>
                 <div style="font-size:10px;color:#999;margin-top:16px" id="unsubPreviewFooter">© Hotel Name</div>
               </div>
@@ -2009,18 +2050,24 @@ If you unsubscribed by mistake, you can re-subscribe below.</textarea>
           <div class="settings-section" id="settings-password">
             <div class="card">
               <div class="card-title mb-4">🔑 Settings Password</div>
-              <div class="text-xs text-muted mb-16">Protect access to Settings & Admin with a password. Others can use the main app but cannot access this area.</div>
-              <div class="alert alert-warning mb-16">
-                ⚠️ <strong>Important:</strong> If you forget your password, you can reset it by clearing your browser's local storage for this page. Keep a note of your password.
+              <div class="text-xs text-muted mb-16">Protect Settings & Admin with a password. Staff who open this file cannot access Settings without the correct password — even if they clear their browser.</div>
+
+              <div class="alert alert-info mb-16">
+                <div>
+                  <strong>How it works:</strong><br>
+                  The password hash is stored <strong>inside this file</strong>, not in the browser. This means clearing the browser cannot bypass it.<br><br>
+                  When you set a password, you'll get a hash code. Send it to <strong>Shazwan</strong> who will update the file with that hash — making it permanent across all devices and browsers.
+                </div>
               </div>
+
               <div id="passwordSetupSection">
                 <div class="form-group">
-                  <label class="form-label">Current Password <span class="text-xs text-muted">(leave blank if none set)</span></label>
+                  <label class="form-label">Current Password <span class="text-xs text-muted">(leave blank if none set yet)</span></label>
                   <input type="password" class="form-control" id="currentPasswordInput" placeholder="Current password">
                 </div>
                 <div class="form-group">
                   <label class="form-label">New Password <span class="required">*</span></label>
-                  <input type="password" class="form-control" id="newPasswordInput" placeholder="Enter new password">
+                  <input type="password" class="form-control" id="newPasswordInput" placeholder="Minimum 4 characters">
                 </div>
                 <div class="form-group">
                   <label class="form-label">Confirm New Password <span class="required">*</span></label>
@@ -2391,8 +2438,6 @@ function init() {
   // Update unsubscribe and welcome previews
   updateUnsubPreview();
   updateWelcomePreview();
-  // Reset settings lock on fresh load
-  settingsUnlocked = false;
 }
 
 // ==============================
@@ -2416,33 +2461,48 @@ function applyTheme(t) {
 // ==============================
 // PASSWORD PROTECTION
 // ==============================
+// PASSWORD IS HARDCODED INSIDE THIS FILE.
+// To change it: go to Settings → 🔑 Password → enter current + new password → Save.
+// Clearing the browser CANNOT bypass this — the correct hash must match what is in this file.
+// Staff who receive this file cannot access Settings without knowing the password.
+
 let settingsUnlocked = false;
 
-function hashPassword(pw) {
-  // Simple hash for localStorage storage — not cryptographic but sufficient for this use case
-  let hash = 0;
-  for (let i = 0; i < pw.length; i++) { hash = ((hash << 5) - hash) + pw.charCodeAt(i); hash |= 0; }
-  return 'ccmp_' + Math.abs(hash).toString(36) + pw.length;
+// CCH2026 is the default password.
+// To change: use the Password tab in Settings, then update SETTINGS_PW_HASH below with the new hash shown.
+let SETTINGS_PW_HASH = 'ccmp2_274c724b_7';
+
+function hashPw(pw) {
+  // Deterministic hash — same password always produces same hash
+  let h = 5381;
+  for (let i = 0; i < pw.length; i++) {
+    h = ((h << 5) + h) ^ pw.charCodeAt(i);
+    h = h >>> 0; // keep unsigned 32-bit
+  }
+  return 'ccmp2_' + h.toString(16) + '_' + pw.length;
 }
 
 function requestSettingsAccess(navEl) {
-  const storedHash = localStorage.getItem('ccmp_pw');
-  if (!storedHash || settingsUnlocked) {
+  // If no password set, or already unlocked this session — open directly
+  if (!SETTINGS_PW_HASH || settingsUnlocked) {
     settingsUnlocked = true;
     showPage('settings', navEl);
     return;
   }
+  // Show password prompt
   document.getElementById('lockPasswordInput').value = '';
   document.getElementById('lockPasswordError').classList.add('hidden');
   openModal('modalPasswordLock');
-  // Store nav element reference for after unlock
   window._pendingSettingsNav = navEl;
 }
 
 function verifyPassword() {
   const input = document.getElementById('lockPasswordInput').value;
-  const storedHash = localStorage.getItem('ccmp_pw');
-  if (hashPassword(input) === storedHash) {
+  if (!input) {
+    document.getElementById('lockPasswordError').classList.remove('hidden');
+    return;
+  }
+  if (hashPw(input) === SETTINGS_PW_HASH) {
     settingsUnlocked = true;
     closeModal('modalPasswordLock');
     showPage('settings', window._pendingSettingsNav);
@@ -2456,47 +2516,68 @@ function verifyPassword() {
 
 function savePassword() {
   const current = document.getElementById('currentPasswordInput').value;
-  const newPw = document.getElementById('newPasswordInput').value;
+  const newPw   = document.getElementById('newPasswordInput').value;
   const confirm = document.getElementById('confirmPasswordInput').value;
-  const storedHash = localStorage.getItem('ccmp_pw');
   const statusEl = document.getElementById('passwordStatus');
 
-  if (storedHash && hashPassword(current) !== storedHash) {
-    statusEl.innerHTML = '<div class="alert alert-danger">Current password is incorrect.</div>';
+  // If a password exists, verify current password first
+  if (SETTINGS_PW_HASH && hashPw(current) !== SETTINGS_PW_HASH) {
+    statusEl.innerHTML = '<div class="alert alert-danger">❌ Current password is incorrect.</div>';
     return;
   }
   if (!newPw) { statusEl.innerHTML = '<div class="alert alert-danger">New password cannot be empty.</div>'; return; }
   if (newPw !== confirm) { statusEl.innerHTML = '<div class="alert alert-danger">Passwords do not match.</div>'; return; }
   if (newPw.length < 4) { statusEl.innerHTML = '<div class="alert alert-danger">Password must be at least 4 characters.</div>'; return; }
 
-  localStorage.setItem('ccmp_pw', hashPassword(newPw));
+  const newHash = hashPw(newPw);
+  SETTINGS_PW_HASH = newHash;
   settingsUnlocked = true;
+
   document.getElementById('currentPasswordInput').value = '';
   document.getElementById('newPasswordInput').value = '';
   document.getElementById('confirmPasswordInput').value = '';
   document.getElementById('removePasswordBtn').style.display = '';
-  statusEl.innerHTML = '<div class="alert alert-success">✅ Password set successfully! Settings are now protected.</div>';
-  addAudit('Settings password updated');
+
+  // Show the hash so Shazwan can update this file to make it permanent
+  statusEl.innerHTML = `
+    <div class="alert alert-success mb-8">✅ Password set for this session.</div>
+    <div class="card" style="background:var(--bg-card2);padding:14px;border:1px solid var(--brand-primary)44">
+      <div style="font-size:11px;font-weight:700;color:var(--brand-primary);margin-bottom:6px">⚠️ IMPORTANT — To make this permanent:</div>
+      <div style="font-size:11px;color:var(--text-secondary);margin-bottom:8px">
+        Copy the hash below. Ask Shazwan to update the <code>SETTINGS_PW_HASH</code> line in this file with this value. Until then, the password resets on browser reload.
+      </div>
+      <div style="font-family:monospace;font-size:11px;background:var(--bg-base);padding:8px;border-radius:4px;word-break:break-all;color:var(--brand-primary)">${newHash}</div>
+      <button class="btn btn-secondary btn-sm mt-8" onclick="copyPwHash('${newHash}')">📋 Copy Hash</button>
+    </div>
+  `;
+  addAudit('Settings password changed');
+}
+
+function copyPwHash(hash) {
+  navigator.clipboard.writeText(hash).catch(() => {});
+  showToast('Hash copied — send to Shazwan to make permanent', 'info');
 }
 
 function removePassword() {
   const current = document.getElementById('currentPasswordInput').value;
-  const storedHash = localStorage.getItem('ccmp_pw');
-  if (storedHash && hashPassword(current) !== storedHash) {
-    document.getElementById('passwordStatus').innerHTML = '<div class="alert alert-danger">Current password is incorrect.</div>';
+  if (SETTINGS_PW_HASH && hashPw(current) !== SETTINGS_PW_HASH) {
+    document.getElementById('passwordStatus').innerHTML = '<div class="alert alert-danger">❌ Current password is incorrect.</div>';
     return;
   }
-  localStorage.removeItem('ccmp_pw');
-  settingsUnlocked = false;
+  SETTINGS_PW_HASH = '';
+  settingsUnlocked = true;
   document.getElementById('removePasswordBtn').style.display = 'none';
-  document.getElementById('passwordStatus').innerHTML = '<div class="alert alert-success">✅ Password removed. Settings are now open.</div>';
+  document.getElementById('passwordStatus').innerHTML = '<div class="alert alert-success">✅ Password removed. Settings are now open until a new password is set.</div>';
   addAudit('Settings password removed');
 }
 
 function checkPasswordSetup() {
-  const has = !!localStorage.getItem('ccmp_pw');
   const btn = document.getElementById('removePasswordBtn');
-  if (btn) btn.style.display = has ? '' : 'none';
+  if (btn) btn.style.display = SETTINGS_PW_HASH ? '' : 'none';
+  const statusEl = document.getElementById('passwordStatus');
+  if (statusEl && !SETTINGS_PW_HASH) {
+    statusEl.innerHTML = '<div class="alert alert-info">ℹ️ No password set. Settings are currently open to anyone with this file.</div>';
+  }
 }
 
 // ==============================
@@ -3019,6 +3100,21 @@ function execFormatW(cmd) {
   document.getElementById('welcomeBody').focus();
   document.execCommand(cmd, false, null);
 }
+function execFormatW2(cmd, val) {
+  document.getElementById('welcomeBody').focus();
+  document.execCommand(cmd, false, val);
+}
+function insertWelcomeTag(tag) {
+  const body = document.getElementById('welcomeBody');
+  body.focus();
+  document.execCommand('insertText', false, tag);
+  updateWelcomePreview();
+}
+function syncColorPicker(pickerId, hexId) {
+  const hex = document.getElementById(hexId)?.value;
+  const picker = document.getElementById(pickerId);
+  if (picker && hex && hex.length === 7 && hex.startsWith('#')) picker.value = hex;
+}
 function insertTag(tag) {
   const body = document.getElementById('emailBody');
   body.focus();
@@ -3129,6 +3225,14 @@ function saveDraft() {
 }
 
 function previewEmail() {
+  const name = document.getElementById('campaignName').value.trim();
+  const subject = document.getElementById('campaignSubject').value.trim();
+  if (!name) { showToast('Please enter a campaign name first', 'error'); return; }
+  if (!subject) { showToast('Please enter a subject line first', 'error'); return; }
+  // Reset preview tabs
+  document.querySelectorAll('#modalPreview .tab').forEach(t => t.classList.remove('active'));
+  const firstTab = document.querySelector('#modalPreview .tab');
+  if (firstTab) firstTab.classList.add('active');
   openModal('modalPreview');
   renderPreview('desktop');
 }
@@ -3351,10 +3455,31 @@ function renderSocialToggles() {
       <div class="toggle ${appState.settings.social[p.key] ? 'on' : ''}" id="social-toggle-${p.key}" onclick="toggleSocial('${p.key}', this)"></div>
     </div>
   `).join('');
+  updateSocialIconsPreview();
 }
 
 function toggleSocial(key, el) {
   el.classList.toggle('on');
+  updateSocialIconsPreview();
+}
+
+function updateSocialIconsPreview() {
+  const el = document.getElementById('socialIconsLivePreview');
+  if (!el) return;
+  const icons = [];
+  SOCIAL_PLATFORMS.forEach(p => {
+    const link = appState.settings.social[p.key];
+    const toggle = document.getElementById('social-toggle-' + p.key);
+    if (toggle && toggle.classList.contains('on')) {
+      const hasLink = !!link;
+      icons.push(`<span title="${p.label}${!hasLink ? ' (no link set — add in Settings → Social Links)' : ''}" style="display:inline-block;margin:0 4px;font-size:22px;opacity:${hasLink ? '1' : '0.3'};cursor:${hasLink ? 'pointer' : 'default'}">${p.icon}</span>`);
+    }
+  });
+  if (icons.length === 0) {
+    el.innerHTML = '<div style="font-size:11px;color:#aaa;padding:8px">No icons toggled on yet</div>';
+  } else {
+    el.innerHTML = `<div style="padding:4px 0">${icons.join('')}</div><div style="font-size:10px;color:#aaa;margin-top:6px">Greyed out = link not set in Settings → Social Links</div>`;
+  }
 }
 
 // ==============================
@@ -3858,11 +3983,16 @@ function previewWelcome() {
 function updateWelcomePreview() {
   const hotel = appState.settings.hotelName || 'Hotel Name';
   const body = document.getElementById('welcomeBody')?.innerHTML || '';
+  const subject = (document.getElementById('welcomeSubject')?.value || '').replace(/{{Hotel Name}}/g, hotel);
   const preview = body.replace(/{{First Name}}/g, 'Guest').replace(/{{Hotel Name}}/g, hotel);
-  const el = document.getElementById('welcomePreviewBody');
-  if (el) el.innerHTML = preview;
+  const bodyEl = document.getElementById('welcomePreviewBody');
+  if (bodyEl) bodyEl.innerHTML = preview;
   const nameEl = document.getElementById('welcomePreviewHotelName');
   if (nameEl) nameEl.textContent = hotel;
+  const subjEl = document.getElementById('welcomePreviewSubject');
+  if (subjEl) subjEl.textContent = subject || 'Welcome to ' + hotel;
+  const bannerEl = document.getElementById('welcomePreviewBanner');
+  if (bannerEl) bannerEl.style.background = appState.settings.secondaryColor || '#2C5F6E';
 }
 
 // ==============================
@@ -3884,24 +4014,33 @@ function saveUnsubPage() {
 function updateUnsubPreview() {
   const hotel = appState.settings.hotelName || 'Hotel Name';
   const headline = document.getElementById('unsubHeadline')?.value || "You've been unsubscribed";
-  const message = document.getElementById('unsubMessage')?.value || '';
+  const message = (document.getElementById('unsubMessage')?.value || '').replace(/{{Hotel Name}}/g, hotel);
   const btn = document.getElementById('unsubResubLabel')?.value || 'Re-subscribe';
   const footer = (document.getElementById('unsubFooter')?.value || '© {{Hotel Name}}').replace(/{{Hotel Name}}/g, hotel);
-  const el_h = document.getElementById('unsubPreviewHeadline');
-  const el_m = document.getElementById('unsubPreviewMessage');
-  const el_b = document.getElementById('unsubPreviewBtn');
-  const el_f = document.getElementById('unsubPreviewFooter');
-  const el_n = document.getElementById('unsubPreviewHotelName');
-  if (el_h) el_h.textContent = headline;
-  if (el_m) el_m.textContent = message.replace(/{{Hotel Name}}/g, hotel).substring(0,120) + '…';
-  if (el_b) el_b.textContent = btn;
-  if (el_f) el_f.textContent = footer;
-  if (el_n) el_n.textContent = hotel;
+  const emoji = document.getElementById('unsubEmoji')?.value || '';
+  const headlineColor = document.getElementById('unsubHeadlineColorHex')?.value || '#1a1e2e';
+  const msgColor = document.getElementById('unsubMsgColorHex')?.value || '#555555';
+
+  const setEl = (id, prop, val) => { const el = document.getElementById(id); if (el) el[prop] = val; };
+  const setStyle = (id, prop, val) => { const el = document.getElementById(id); if (el) el.style[prop] = val; };
+
+  setEl('unsubPreviewHeadline', 'textContent', headline);
+  setStyle('unsubPreviewHeadline', 'color', headlineColor);
+  setEl('unsubPreviewMessage', 'textContent', message.length > 140 ? message.substring(0, 140) + '…' : message);
+  setStyle('unsubPreviewMessage', 'color', msgColor);
+  setEl('unsubPreviewBtn', 'textContent', btn);
+  setEl('unsubPreviewFooter', 'textContent', footer);
+  setEl('unsubPreviewHotelName', 'textContent', hotel);
+  setEl('unsubPreviewEmoji', 'textContent', emoji);
+  setStyle('unsubPreviewEmoji', 'display', emoji ? '' : 'none');
   const header = document.getElementById('unsubPreviewHeader');
   if (header) header.style.background = appState.settings.secondaryColor || '#2C5F6E';
+  // Sync color pickers
+  const hc = document.getElementById('unsubHeadlineColor');
+  if (hc && headlineColor.length === 7) hc.value = headlineColor;
+  const mc = document.getElementById('unsubMsgColor');
+  if (mc && msgColor.length === 7) mc.value = msgColor;
 }
-
-function previewUnsubPage() { updateUnsubPreview(); showToast('Preview updated', 'info'); }
 
 // ==============================
 // SNIPPET
@@ -4155,7 +4294,8 @@ document.addEventListener('DOMContentLoaded', init);
 
 // Auto-update unsubscribe preview on input change
 document.addEventListener('input', function(e) {
-  if (['unsubHeadline','unsubMessage','unsubResubLabel','unsubFooter'].includes(e.target.id)) updateUnsubPreview();
+  const unsubFields = ['unsubHeadline','unsubMessage','unsubResubLabel','unsubFooter','unsubEmoji','unsubHeadlineColorHex','unsubMsgColorHex'];
+  if (unsubFields.includes(e.target.id)) updateUnsubPreview();
   if (e.target.id === 'welcomeBody' || e.target.id === 'welcomeSubject') updateWelcomePreview();
   if (e.target.id === 'settingHotelName') liveUpdateHotelName();
   if (e.target.id === 'recipientSegment') updateRecipientCount();
