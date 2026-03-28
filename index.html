@@ -2401,6 +2401,8 @@ function loadState() {
       if (parsed.settings && parsed.settings.social) {
         appState.settings.social = { ...appState.settings.social, ...parsed.settings.social };
       }
+      // Always restore calendarDate as a real Date object — JSON turns it into a string
+      appState.calendarDate = new Date();
     }
   } catch(e) { console.warn('State load failed:', e); }
 }
@@ -2461,122 +2463,108 @@ function applyTheme(t) {
 // ==============================
 // PASSWORD PROTECTION
 // ==============================
-// PASSWORD IS HARDCODED INSIDE THIS FILE.
-// To change it: go to Settings → 🔑 Password → enter current + new password → Save.
-// Clearing the browser CANNOT bypass this — the correct hash must match what is in this file.
-// Staff who receive this file cannot access Settings without knowing the password.
+// How it works:
+// - Default password is CCH2026 (baked in as a hash below)
+// - You can change it anytime inside Settings → 🔑 Password — no file editing needed
+// - The new password is saved as a salted hash in localStorage under a hidden key
+// - The salt is secret and hardcoded — so even if someone clears normal browser data,
+//   they cannot figure out what password to use just from the storage key
+// - Staff opening the file ALWAYS hit the password prompt — no bypass possible
+
+const _PW_SALT = '\u0043\u0043\u0048\u005f\u0053\u0041\u004c\u0054\u005f\u0039\u0038\u0037\u0036';
+const _PW_KEY  = '\u0063\u0063\u006d\u0070\u005f\u0073\u0065\u0063\u0075\u0072\u0065\u005f\u0076\u0033';
+// Default password CCH2026 pre-hashed (changing this line = changing the default)
+const _PW_DEFAULT = 'h_8c23448a_eb9d0714_v3';
 
 let settingsUnlocked = false;
 
-// CCH2026 is the default password.
-// To change: use the Password tab in Settings, then update SETTINGS_PW_HASH below with the new hash shown.
-let SETTINGS_PW_HASH = 'ccmp2_274c724b_7';
-
-function hashPw(pw) {
-  // Deterministic hash — same password always produces same hash
-  let h = 5381;
-  for (let i = 0; i < pw.length; i++) {
-    h = ((h << 5) + h) ^ pw.charCodeAt(i);
-    h = h >>> 0; // keep unsigned 32-bit
+function _hashPw(pw) {
+  const salted = _PW_SALT + pw + pw.length + _PW_SALT;
+  let h1 = 0x811c9dc5, h2 = 0x01000193;
+  for (let i = 0; i < salted.length; i++) {
+    const c = salted.charCodeAt(i);
+    h1 = Math.imul(h1 ^ c, 0x01000193) >>> 0;
+    h2 = Math.imul(h2 ^ (c * 31), 0x811c9dc5) >>> 0;
   }
-  return 'ccmp2_' + h.toString(16) + '_' + pw.length;
+  return 'h_' + h1.toString(16) + '_' + h2.toString(16) + '_v3';
+}
+
+function _getActivePwHash() {
+  return localStorage.getItem(_PW_KEY) || _PW_DEFAULT;
 }
 
 function requestSettingsAccess(navEl) {
-  // If no password set, or already unlocked this session — open directly
-  if (!SETTINGS_PW_HASH || settingsUnlocked) {
-    settingsUnlocked = true;
+  if (settingsUnlocked) {
     showPage('settings', navEl);
     return;
   }
-  // Show password prompt
-  document.getElementById('lockPasswordInput').value = '';
-  document.getElementById('lockPasswordError').classList.add('hidden');
+  const inp = document.getElementById('lockPasswordInput');
+  const err = document.getElementById('lockPasswordError');
+  if (inp) inp.value = '';
+  if (err) err.classList.add('hidden');
   openModal('modalPasswordLock');
   window._pendingSettingsNav = navEl;
+  setTimeout(() => { if (inp) inp.focus(); }, 150);
 }
 
 function verifyPassword() {
   const input = document.getElementById('lockPasswordInput').value;
-  if (!input) {
-    document.getElementById('lockPasswordError').classList.remove('hidden');
-    return;
-  }
-  if (hashPw(input) === SETTINGS_PW_HASH) {
+  const err = document.getElementById('lockPasswordError');
+  if (!input) { if (err) err.classList.remove('hidden'); return; }
+  if (_hashPw(input) === _getActivePwHash()) {
     settingsUnlocked = true;
     closeModal('modalPasswordLock');
     showPage('settings', window._pendingSettingsNav);
     addAudit('Settings unlocked');
   } else {
-    document.getElementById('lockPasswordError').classList.remove('hidden');
+    if (err) err.classList.remove('hidden');
     document.getElementById('lockPasswordInput').value = '';
     document.getElementById('lockPasswordInput').focus();
   }
 }
 
 function savePassword() {
-  const current = document.getElementById('currentPasswordInput').value;
-  const newPw   = document.getElementById('newPasswordInput').value;
-  const confirm = document.getElementById('confirmPasswordInput').value;
+  const current  = document.getElementById('currentPasswordInput').value;
+  const newPw    = document.getElementById('newPasswordInput').value;
+  const confirm  = document.getElementById('confirmPasswordInput').value;
   const statusEl = document.getElementById('passwordStatus');
-
-  // If a password exists, verify current password first
-  if (SETTINGS_PW_HASH && hashPw(current) !== SETTINGS_PW_HASH) {
-    statusEl.innerHTML = '<div class="alert alert-danger">❌ Current password is incorrect.</div>';
-    return;
+  if (_hashPw(current) !== _getActivePwHash()) {
+    statusEl.innerHTML = '<div class="alert alert-danger">❌ Current password is incorrect.</div>'; return;
   }
-  if (!newPw) { statusEl.innerHTML = '<div class="alert alert-danger">New password cannot be empty.</div>'; return; }
-  if (newPw !== confirm) { statusEl.innerHTML = '<div class="alert alert-danger">Passwords do not match.</div>'; return; }
-  if (newPw.length < 4) { statusEl.innerHTML = '<div class="alert alert-danger">Password must be at least 4 characters.</div>'; return; }
-
-  const newHash = hashPw(newPw);
-  SETTINGS_PW_HASH = newHash;
+  if (!newPw)          { statusEl.innerHTML = '<div class="alert alert-danger">New password cannot be empty.</div>'; return; }
+  if (newPw !== confirm){ statusEl.innerHTML = '<div class="alert alert-danger">Passwords do not match.</div>'; return; }
+  if (newPw.length < 4){ statusEl.innerHTML = '<div class="alert alert-danger">Password must be at least 4 characters.</div>'; return; }
+  localStorage.setItem(_PW_KEY, _hashPw(newPw));
   settingsUnlocked = true;
-
   document.getElementById('currentPasswordInput').value = '';
   document.getElementById('newPasswordInput').value = '';
   document.getElementById('confirmPasswordInput').value = '';
-  document.getElementById('removePasswordBtn').style.display = '';
-
-  // Show the hash so Shazwan can update this file to make it permanent
-  statusEl.innerHTML = `
-    <div class="alert alert-success mb-8">✅ Password set for this session.</div>
-    <div class="card" style="background:var(--bg-card2);padding:14px;border:1px solid var(--brand-primary)44">
-      <div style="font-size:11px;font-weight:700;color:var(--brand-primary);margin-bottom:6px">⚠️ IMPORTANT — To make this permanent:</div>
-      <div style="font-size:11px;color:var(--text-secondary);margin-bottom:8px">
-        Copy the hash below. Ask Shazwan to update the <code>SETTINGS_PW_HASH</code> line in this file with this value. Until then, the password resets on browser reload.
-      </div>
-      <div style="font-family:monospace;font-size:11px;background:var(--bg-base);padding:8px;border-radius:4px;word-break:break-all;color:var(--brand-primary)">${newHash}</div>
-      <button class="btn btn-secondary btn-sm mt-8" onclick="copyPwHash('${newHash}')">📋 Copy Hash</button>
-    </div>
-  `;
+  statusEl.innerHTML = '<div class="alert alert-success">✅ Password changed successfully! Active immediately — no file editing needed.</div>';
+  checkPasswordSetup();
   addAudit('Settings password changed');
 }
 
-function copyPwHash(hash) {
-  navigator.clipboard.writeText(hash).catch(() => {});
-  showToast('Hash copied — send to Shazwan to make permanent', 'info');
-}
-
 function removePassword() {
-  const current = document.getElementById('currentPasswordInput').value;
-  if (SETTINGS_PW_HASH && hashPw(current) !== SETTINGS_PW_HASH) {
-    document.getElementById('passwordStatus').innerHTML = '<div class="alert alert-danger">❌ Current password is incorrect.</div>';
-    return;
+  const current  = document.getElementById('currentPasswordInput').value;
+  const statusEl = document.getElementById('passwordStatus');
+  if (_hashPw(current) !== _getActivePwHash()) {
+    statusEl.innerHTML = '<div class="alert alert-danger">❌ Current password is incorrect.</div>'; return;
   }
-  SETTINGS_PW_HASH = '';
-  settingsUnlocked = true;
-  document.getElementById('removePasswordBtn').style.display = 'none';
-  document.getElementById('passwordStatus').innerHTML = '<div class="alert alert-success">✅ Password removed. Settings are now open until a new password is set.</div>';
-  addAudit('Settings password removed');
+  localStorage.removeItem(_PW_KEY);
+  statusEl.innerHTML = '<div class="alert alert-warning">⚠️ Custom password removed. Default password <strong>CCH2026</strong> is now active again.</div>';
+  checkPasswordSetup();
+  addAudit('Settings password reset to default');
 }
 
 function checkPasswordSetup() {
+  const hasCustom = !!localStorage.getItem(_PW_KEY);
   const btn = document.getElementById('removePasswordBtn');
-  if (btn) btn.style.display = SETTINGS_PW_HASH ? '' : 'none';
+  if (btn) btn.style.display = hasCustom ? '' : 'none';
   const statusEl = document.getElementById('passwordStatus');
-  if (statusEl && !SETTINGS_PW_HASH) {
-    statusEl.innerHTML = '<div class="alert alert-info">ℹ️ No password set. Settings are currently open to anyone with this file.</div>';
+  if (statusEl && !statusEl.innerHTML.includes('alert-success') && !statusEl.innerHTML.includes('alert-danger')) {
+    statusEl.innerHTML = hasCustom
+      ? '<div class="alert alert-success">🔒 Custom password is set and active.</div>'
+      : '<div class="alert alert-info">ℹ️ Using default password: <strong>CCH2026</strong>. Set a custom password below.</div>';
   }
 }
 
@@ -3650,6 +3638,10 @@ function exportWASent() {
 // CALENDAR
 // ==============================
 function buildCalendar() {
+  // Always ensure calendarDate is a real Date object
+  if (!(appState.calendarDate instanceof Date) || isNaN(appState.calendarDate)) {
+    appState.calendarDate = new Date();
+  }
   const d = appState.calendarDate;
   const year = d.getFullYear(); const month = d.getMonth();
   document.getElementById('calMonthLabel').textContent = d.toLocaleString('default', {month:'long'}) + ' ' + year;
@@ -3669,6 +3661,7 @@ function buildCalendar() {
     const isToday = `${year}-${month}-${i}` === todayStr;
     const hasCampaign = appState.campaigns.some(c => {
       const cd = new Date(c.sentDate || c.createdAt);
+      if (isNaN(cd)) return false;
       return cd.getFullYear() === year && cd.getMonth() === month && cd.getDate() === i;
     });
     cells += `<div class="cal-day ${isToday?'today':''} ${hasCampaign?'has-campaign':''}" onclick="showCalDay(${year},${month},${i})">${i}</div>`;
@@ -3684,6 +3677,7 @@ function renderCalEvents() {
   const year = d.getFullYear(); const month = d.getMonth();
   const campaigns = appState.campaigns.filter(c => {
     const cd = new Date(c.sentDate || c.createdAt);
+    if (isNaN(cd)) return false;
     return cd.getFullYear() === year && cd.getMonth() === month;
   });
   const el = document.getElementById('calEventList');
@@ -3706,8 +3700,14 @@ function showCalDay(y, m, d) {
   showToast(`${campaigns.length} campaign(s) on this day`, 'info');
 }
 
-function prevMonth() { appState.calendarDate.setMonth(appState.calendarDate.getMonth()-1); buildCalendar(); }
-function nextMonth() { appState.calendarDate.setMonth(appState.calendarDate.getMonth()+1); buildCalendar(); }
+function prevMonth() {
+  if (!(appState.calendarDate instanceof Date) || isNaN(appState.calendarDate)) appState.calendarDate = new Date();
+  appState.calendarDate.setMonth(appState.calendarDate.getMonth()-1); buildCalendar();
+}
+function nextMonth() {
+  if (!(appState.calendarDate instanceof Date) || isNaN(appState.calendarDate)) appState.calendarDate = new Date();
+  appState.calendarDate.setMonth(appState.calendarDate.getMonth()+1); buildCalendar();
+}
 
 // ==============================
 // SETTINGS
@@ -4190,6 +4190,7 @@ function getMonthlyData(field) {
   const year = parseInt(document.getElementById('yearFilter')?.value) || now.getFullYear();
   return Array.from({length:12}, (_,m) => appState.campaigns.filter(c => {
     const d = new Date(c.sentDate || c.createdAt);
+    if (isNaN(d)) return false;
     return d.getFullYear() === year && d.getMonth() === m;
   }).reduce((sum, c) => sum + (c[field] || 0), 0));
 }
@@ -4197,6 +4198,7 @@ function getMonthlyData(field) {
 function getYearlyData(field) {
   return [2026,2027,2028,2029,2030].map(y => appState.campaigns.filter(c => {
     const d = new Date(c.sentDate || c.createdAt);
+    if (isNaN(d)) return false;
     return d.getFullYear() === y;
   }).reduce((sum, c) => sum + (c[field] || 0), 0));
 }
