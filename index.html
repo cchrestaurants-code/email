@@ -405,16 +405,20 @@ textarea.form-control { min-height: 100px; resize: vertical; }
 .toggle.on::after { transform: translateX(18px); }
 .toggle-label { font-size: 12px; color: var(--text-secondary); }
 
-/* ===== MODAL ===== */
+/* ===== MODAL SYSTEM - FIXED ===== */
 .modal-overlay {
-  position: fixed; inset:0;
-  background: rgba(0,0,0,0.7);
-  z-index: 200;
-  display: flex; align-items:center; justify-content:center;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 16px;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(3px);
+  pointer-events: all;
 }
-.modal-overlay.hidden { display:none; }
+.modal-overlay.hidden { display: none !important; }
 .modal {
   background: var(--bg-card);
   border: 1px solid var(--border);
@@ -2461,8 +2465,18 @@ function closeSidebar() {
 // ==============================
 // MODAL
 // ==============================
-function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+function openModal(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  // Move to body so no parent stacking context can interfere
+  document.body.appendChild(el);
+  el.classList.remove('hidden');
+}
+function closeModal(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.add('hidden');
+}
 function showAddContactModal() { openModal('modalAddContact'); }
 function showImportModal() { openModal('modalImport'); }
 function showGSheetsModal() {
@@ -3725,6 +3739,8 @@ function applyBrandColor(type, val) {
     const picker = document.getElementById('colorPrimary');
     if (hex) hex.value = val;
     if (picker) picker.value = val;
+    // Rebuild snippet with new color
+    buildSnippet();
   }
   if (type === 'secondary') {
     document.documentElement.style.setProperty('--brand-secondary', val);
@@ -3759,9 +3775,10 @@ function liveUpdateHotelName() {
   document.getElementById('sidebarHotelName').textContent = name.length > 22 ? name.substring(0,22)+'…' : name;
   const initials = name.split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
   document.getElementById('sidebarLogoText').textContent = initials;
-  // Update snippet preview
+  // Update snippet preview hotel name
   const snippetHotel = document.getElementById('snippetPreviewHotel');
   if (snippetHotel) snippetHotel.textContent = name;
+  // Rebuild snippet with new hotel name
   buildSnippet();
 }
 
