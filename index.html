@@ -916,9 +916,8 @@ textarea.form-control { min-height: 100px; resize: vertical; }
     <div class="nav-item" onclick="showPage('unsub-editor',this)">
       <span class="nav-icon">🚪</span> Unsubscribe Page
     </div>
-    <div class="nav-item" onclick="requestSettingsAccess(this)">
+    <div class="nav-item" onclick="showPage('settings',this)">
       <span class="nav-icon">⚙️</span> Settings & Admin
-      <span style="font-size:10px;margin-left:auto">🔒</span>
     </div>
   </nav>
 
@@ -1713,7 +1712,6 @@ If you unsubscribed by mistake, you can re-subscribe below.</textarea>
           <div class="settings-nav-item" onclick="showSettingsTab('footer-image',this)">🖼️ Email Footer</div>
           <div class="settings-nav-item" onclick="showSettingsTab('snippet',this)">🔗 Signup Snippet</div>
           <div class="settings-nav-item" onclick="showSettingsTab('audit',this)">📝 Audit Log</div>
-          <div class="settings-nav-item" onclick="showSettingsTab('password',this)">🔑 Password</div>
         </div>
         <div class="settings-panel">
           <!-- Hotel Profile -->
@@ -2046,42 +2044,6 @@ If you unsubscribed by mistake, you can re-subscribe below.</textarea>
             </div>
           </div>
 
-          <!-- Password -->
-          <div class="settings-section" id="settings-password">
-            <div class="card">
-              <div class="card-title mb-4">🔑 Settings Password</div>
-              <div class="text-xs text-muted mb-16">Protect Settings & Admin with a password. Staff who open this file cannot access Settings without the correct password — even if they clear their browser.</div>
-
-              <div class="alert alert-info mb-16">
-                <div>
-                  <strong>How it works:</strong><br>
-                  The password hash is stored <strong>inside this file</strong>, not in the browser. This means clearing the browser cannot bypass it.<br><br>
-                  When you set a password, you'll get a hash code. Send it to <strong>Shazwan</strong> who will update the file with that hash — making it permanent across all devices and browsers.
-                </div>
-              </div>
-
-              <div id="passwordSetupSection">
-                <div class="form-group">
-                  <label class="form-label">Current Password <span class="text-xs text-muted">(leave blank if none set yet)</span></label>
-                  <input type="password" class="form-control" id="currentPasswordInput" placeholder="Current password">
-                </div>
-                <div class="form-group">
-                  <label class="form-label">New Password <span class="required">*</span></label>
-                  <input type="password" class="form-control" id="newPasswordInput" placeholder="Minimum 4 characters">
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Confirm New Password <span class="required">*</span></label>
-                  <input type="password" class="form-control" id="confirmPasswordInput" placeholder="Repeat new password">
-                </div>
-                <div class="flex gap-8">
-                  <button class="btn btn-primary" onclick="savePassword()">🔒 Set Password</button>
-                  <button class="btn btn-danger" onclick="removePassword()" id="removePasswordBtn" style="display:none">🔓 Remove Password</button>
-                </div>
-                <div id="passwordStatus" class="mt-12"></div>
-              </div>
-            </div>
-          </div>
-
   </div><!-- page-body -->
 </div><!-- main-content -->
 
@@ -2281,29 +2243,6 @@ If you unsubscribed by mistake, you can re-subscribe below.</textarea>
   </div>
 </div>
 
-<!-- Password Lock Modal -->
-<div class="modal-overlay hidden" id="modalPasswordLock">
-  <div class="modal" style="max-width:380px">
-    <div class="modal-header">
-      <div class="modal-title">🔒 Settings & Admin</div>
-    </div>
-    <div class="modal-body">
-      <div class="text-xs text-muted mb-16">This area is password protected. Enter your password to continue.</div>
-      <div class="form-group">
-        <label class="form-label">Password</label>
-        <input type="password" class="form-control" id="lockPasswordInput" placeholder="Enter password" onkeydown="if(event.key==='Enter')verifyPassword()">
-      </div>
-      <div id="lockPasswordError" class="hidden">
-        <div class="alert alert-danger" style="margin-bottom:0">Incorrect password. Please try again.</div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('modalPasswordLock')">Cancel</button>
-      <button class="btn btn-primary" onclick="verifyPassword()">Unlock →</button>
-    </div>
-  </div>
-</div>
-
 <!-- TOAST -->
 <div class="toast" id="toast">
   <span id="toastIcon">✅</span>
@@ -2427,7 +2366,6 @@ function init() {
   buildSnippet();
   renderAuditLog();
   updateNavBadges();
-  checkPasswordSetup();
   loadFooterImgToUI();
   addAudit('App loaded', 'info');
   // Set today's date defaults
@@ -2457,114 +2395,6 @@ function applyTheme(t) {
   btn.textContent = t === 'dark' ? '☀️ Light' : '🌙 Dark';
   if (window._chartMonthly) {
     setTimeout(() => { destroyCharts(); initCharts(); updateDashboard(); }, 50);
-  }
-}
-
-// ==============================
-// PASSWORD PROTECTION
-// ==============================
-// How it works:
-// - Default password is CCH2026 (baked in as a hash below)
-// - You can change it anytime inside Settings → 🔑 Password — no file editing needed
-// - The new password is saved as a salted hash in localStorage under a hidden key
-// - The salt is secret and hardcoded — so even if someone clears normal browser data,
-//   they cannot figure out what password to use just from the storage key
-// - Staff opening the file ALWAYS hit the password prompt — no bypass possible
-
-const _PW_SALT = '\u0043\u0043\u0048\u005f\u0053\u0041\u004c\u0054\u005f\u0039\u0038\u0037\u0036';
-const _PW_KEY  = '\u0063\u0063\u006d\u0070\u005f\u0073\u0065\u0063\u0075\u0072\u0065\u005f\u0076\u0033';
-// Default password CCH2026 pre-hashed (changing this line = changing the default)
-const _PW_DEFAULT = 'h_8c23448a_eb9d0714_v3';
-
-let settingsUnlocked = false;
-
-function _hashPw(pw) {
-  const salted = _PW_SALT + pw + pw.length + _PW_SALT;
-  let h1 = 0x811c9dc5, h2 = 0x01000193;
-  for (let i = 0; i < salted.length; i++) {
-    const c = salted.charCodeAt(i);
-    h1 = Math.imul(h1 ^ c, 0x01000193) >>> 0;
-    h2 = Math.imul(h2 ^ (c * 31), 0x811c9dc5) >>> 0;
-  }
-  return 'h_' + h1.toString(16) + '_' + h2.toString(16) + '_v3';
-}
-
-function _getActivePwHash() {
-  return localStorage.getItem(_PW_KEY) || _PW_DEFAULT;
-}
-
-function requestSettingsAccess(navEl) {
-  if (settingsUnlocked) {
-    showPage('settings', navEl);
-    return;
-  }
-  const inp = document.getElementById('lockPasswordInput');
-  const err = document.getElementById('lockPasswordError');
-  if (inp) inp.value = '';
-  if (err) err.classList.add('hidden');
-  openModal('modalPasswordLock');
-  window._pendingSettingsNav = navEl;
-  setTimeout(() => { if (inp) inp.focus(); }, 150);
-}
-
-function verifyPassword() {
-  const input = document.getElementById('lockPasswordInput').value;
-  const err = document.getElementById('lockPasswordError');
-  if (!input) { if (err) err.classList.remove('hidden'); return; }
-  if (_hashPw(input) === _getActivePwHash()) {
-    settingsUnlocked = true;
-    closeModal('modalPasswordLock');
-    showPage('settings', window._pendingSettingsNav);
-    addAudit('Settings unlocked');
-  } else {
-    if (err) err.classList.remove('hidden');
-    document.getElementById('lockPasswordInput').value = '';
-    document.getElementById('lockPasswordInput').focus();
-  }
-}
-
-function savePassword() {
-  const current  = document.getElementById('currentPasswordInput').value;
-  const newPw    = document.getElementById('newPasswordInput').value;
-  const confirm  = document.getElementById('confirmPasswordInput').value;
-  const statusEl = document.getElementById('passwordStatus');
-  if (_hashPw(current) !== _getActivePwHash()) {
-    statusEl.innerHTML = '<div class="alert alert-danger">❌ Current password is incorrect.</div>'; return;
-  }
-  if (!newPw)          { statusEl.innerHTML = '<div class="alert alert-danger">New password cannot be empty.</div>'; return; }
-  if (newPw !== confirm){ statusEl.innerHTML = '<div class="alert alert-danger">Passwords do not match.</div>'; return; }
-  if (newPw.length < 4){ statusEl.innerHTML = '<div class="alert alert-danger">Password must be at least 4 characters.</div>'; return; }
-  localStorage.setItem(_PW_KEY, _hashPw(newPw));
-  settingsUnlocked = true;
-  document.getElementById('currentPasswordInput').value = '';
-  document.getElementById('newPasswordInput').value = '';
-  document.getElementById('confirmPasswordInput').value = '';
-  statusEl.innerHTML = '<div class="alert alert-success">✅ Password changed successfully! Active immediately — no file editing needed.</div>';
-  checkPasswordSetup();
-  addAudit('Settings password changed');
-}
-
-function removePassword() {
-  const current  = document.getElementById('currentPasswordInput').value;
-  const statusEl = document.getElementById('passwordStatus');
-  if (_hashPw(current) !== _getActivePwHash()) {
-    statusEl.innerHTML = '<div class="alert alert-danger">❌ Current password is incorrect.</div>'; return;
-  }
-  localStorage.removeItem(_PW_KEY);
-  statusEl.innerHTML = '<div class="alert alert-warning">⚠️ Custom password removed. Default password <strong>CCH2026</strong> is now active again.</div>';
-  checkPasswordSetup();
-  addAudit('Settings password reset to default');
-}
-
-function checkPasswordSetup() {
-  const hasCustom = !!localStorage.getItem(_PW_KEY);
-  const btn = document.getElementById('removePasswordBtn');
-  if (btn) btn.style.display = hasCustom ? '' : 'none';
-  const statusEl = document.getElementById('passwordStatus');
-  if (statusEl && !statusEl.innerHTML.includes('alert-success') && !statusEl.innerHTML.includes('alert-danger')) {
-    statusEl.innerHTML = hasCustom
-      ? '<div class="alert alert-success">🔒 Custom password is set and active.</div>'
-      : '<div class="alert alert-info">ℹ️ Using default password: <strong>CCH2026</strong>. Set a custom password below.</div>';
   }
 }
 
@@ -2607,7 +2437,7 @@ function showPage(id, navEl) {
   if (id === 'dashboard') updateDashboard();
   if (id === 'snippet') { buildSnippet(); showSettingsTab('snippet', null); }
   if (id === 'audit') { renderAuditLog(); showSettingsTab('audit', null); }
-  if (id === 'settings') { buildSnippet(); renderAuditLog(); checkPasswordSetup(); loadFooterImgToUI(); }
+  if (id === 'settings') { buildSnippet(); renderAuditLog(); loadFooterImgToUI(); }
   if (id === 'scheduled') renderScheduled();
   if (id === 'segments') renderSegments();
   if (id === 'unsubscribed') renderUnsubList();
@@ -4048,8 +3878,12 @@ function updateUnsubPreview() {
 function buildSnippet() {
   const hotel = appState.settings.hotelName || 'Your Hotel';
   const color = appState.settings.primaryColor || '#C9A96E';
+  // NOTE: Script tags are intentionally split with + to prevent the browser HTML parser
+  // from treating them as real script blocks inside this JS template literal
+  const scriptOpen  = '<' + 'script>';
+  const scriptClose = '<' + '/script>';
   const snippet = `<!-- ${hotel} Newsletter Signup Form -->
-<!-- Paste this code wherever you want the form to appear on your website -->
+<!-- Paste this on your website where you want the signup form to appear -->
 <div id="ccmp-signup" style="font-family:'Poppins',sans-serif;max-width:400px;padding:24px;background:#fff;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.08)">
   <h3 style="margin:0 0 4px;font-size:18px;color:#1a1e2e">Stay in the know</h3>
   <p style="margin:0 0 16px;font-size:13px;color:#888">Subscribe to receive exclusive offers from ${hotel}</p>
@@ -4060,20 +3894,18 @@ function buildSnippet() {
   <p style="font-size:10px;color:#aaa;text-align:center;margin-top:8px">We respect your privacy. Unsubscribe anytime.</p>
   <div id="ccmp-msg" style="display:none;margin-top:8px;padding:8px;border-radius:6px;font-size:12px;text-align:center"></div>
 </div>
-<script>
+${scriptOpen}
 function ccmpSubmit(){
   var name=document.getElementById('ccmp-name').value.trim();
   var email=document.getElementById('ccmp-email').value.trim();
   var mobile=document.getElementById('ccmp-mobile').value.trim();
   var msg=document.getElementById('ccmp-msg');
   if(!name||!email){msg.style.display='block';msg.style.background='#ffeaea';msg.style.color='#c0392b';msg.textContent='Name and email are required.';return;}
-  // Send to your backend or Google Sheets Web App URL:
-  // fetch('YOUR_GOOGLE_APPS_SCRIPT_URL?action=subscribe&name='+encodeURIComponent(name)+'&email='+encodeURIComponent(email)+'&mobile='+encodeURIComponent(mobile))
   msg.style.display='block';msg.style.background='#eafbea';msg.style.color='#27ae60';
   msg.textContent='Thank you for subscribing!';
   document.getElementById('ccmp-name').value='';document.getElementById('ccmp-email').value='';document.getElementById('ccmp-mobile').value='';
 }
-<\/script>
+${scriptClose}
 <!-- End ${hotel} Signup Form -->`;
   const el = document.getElementById('snippetCode');
   if (el) el.textContent = snippet;
